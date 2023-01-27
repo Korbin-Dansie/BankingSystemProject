@@ -7,6 +7,24 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
+// Customer Pages
+var loginRouter = require('./routes/login');
+var landingRouter = require('./routes/landingPage');
+var transactionHistoryRouter = require('./routes/transactionHistory');
+var transferRouter = require('./routes/transfer');
+
+
+// Employee Pages
+var transactRouter = require('./routes/transactPage');
+
+
+// Admin Pages
+var registerRouter = require('./routes/register');
+var passwordRouter = require('./routes/changePassword');
+var manageRouter = require('./routes/manage');
+
+
+
 var app = express();
 
 // view engine setup
@@ -21,6 +39,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+
+// Customer Pages
+app.use('/login', loginRouter);
+app.use('/landingPage', landingRouter);
+app.use('/transactionHistory', transactionHistoryRouter);
+app.use('/transfer', transferRouter);
+
+// Employee Pages
+app.use('/transact', transactRouter);
+
+// Admin Pages
+app.use('/register', registerRouter);
+app.use('/changePassword', passwordRouter);
+app.use('/managePermissions', manageRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
