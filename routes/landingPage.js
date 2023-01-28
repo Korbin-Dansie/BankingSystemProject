@@ -6,4 +6,9 @@ router.get('/', function(req, res, next) {
   res.render('landingPage', { });
 });
 
+
+/* POST home page. */
+router.post('/', function(req, res, next) {
+  res.render('landingPage', { });
+});
 module.exports = router;

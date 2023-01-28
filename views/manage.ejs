@@ -1,11 +1,51 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Mangage</title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1>Mangage</h1>
-    <p>Welcome to</p>
-  </body>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Select</title>
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="font/bootstrap-icons.css" />
+</head>
+
+<body>
+  <div class="container-fluid vh-100" style="margin-top:10px">
+    <div class="" style="margin-top:100px">
+      <div class="rounded d-flex justify-content-center">
+        <div class="col-md-4 col-sm-12 shadow-lg p-5 bg-light">
+          <div class="text-center">
+            <h3 class="text-primary">Bank</h3>
+            <h3 class="text-primary">Manage User Permissions</h3>
+          </div>
+          <form action="/adminreportresult" method="post">
+            <div class="p-4">
+              <!-- Education -->
+              <div class="input-group mb-3"> 
+                <span class="input-group-text bg-primary">
+                  <i class="bi bi-book-fill text-white"></i>
+                </span>
+                <div class="input-group mb-3">
+                    <span class="input-group-text bg-primary">
+                      <i class="bi bi-person-plus-fill text-white"></i>
+                    </span>
+                    <input id="accountNumber" name="accountNumber" type="text" class="form-control" autofocus="autofocus" placeholder="Account Number">
+                  </div>                    
+              </div>
+
+              <!-- Endof Personal Addition -->
+              <!-- This is the password that gets sent even though they are hidden -->
+              <div class="text-center">
+                <button class="btn btn-primary text-center mt-2" type="submit">
+                  Submit
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
 </html>
