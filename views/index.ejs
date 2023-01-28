@@ -3,18 +3,22 @@
   <head>
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="font/bootstrap-icons.css" />
+
   </head>
   <body>
     <h1><%= title %></h1>
     <p>Welcome to <%= title %></p>
-
-    <li><a href="/login">login</a></li>
-    <li><a href="/landingPage">landingPage</a></li>
-    <li><a href="/transactionHistory">transactionHistory</a></li>
-    <li><a href="/transfer">transfer</a></li>
-    <li><a href="/transact">transact</a></li>
-    <li><a href="/register">register</a></li>
-    <li><a href="/changePassword">changePassword</a></li>
-    <li><a href="/managePermissions">managePermissions</a></li>
+    <div class="list-group">
+      <a href="/login" class="list-group-item list-group-item-action">login</a></li>
+      <a href="/landingPage" class="list-group-item list-group-item-action">landingPage</a></li>
+      <a href="/transactionHistory" class="list-group-item list-group-item-action">transactionHistory</a></li>
+      <a href="/transfer" class="list-group-item list-group-item-action">transfer</a></li>
+      <a href="/transact" class="list-group-item list-group-item-action">transact</a></li>
+      <a href="/register" class="list-group-item list-group-item-action">register</a></li>
+      <a href="/changePassword" class="list-group-item list-group-item-action">changePassword</a></li>
+      <a href="/managePermissions" class="list-group-item list-group-item-action">managePermissions</a></li>  
+    </div>
   </body>
 </html>

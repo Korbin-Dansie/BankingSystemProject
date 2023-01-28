@@ -6,4 +6,8 @@ router.get('/', function(req, res, next) {
   res.render('manage', { });
 });
 
+
+router.post('/', function(req, res, next) {
+  res.render('manageResults', { });
+});
 module.exports = router;

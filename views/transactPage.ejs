@@ -1,13 +1,49 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Transact</title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1>Transact</h1>
-    <p>Welcome to the transact page. This is were an employee will deposit or withdraw money.</p>
-    <p>They will inperson verify it is them</p>
-    <p>Then they will enter a form with the account number, which type (savings / checking), withdraw / deposit, and an amount</p>
-  </body>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bootstrap 5 Login Form Example</title>
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="font/bootstrap-icons.css" />
+
+  <script>
+    function checkPassword(event) {}
+  </script>
+
+</head>
+
+<body>
+  <div class="container-fluid vh-100" style="margin-top:10px">
+    <div class="" style="margin-top:100px">
+      <div class="rounded d-flex justify-content-center">
+        <div class="col-md-4 col-sm-12 shadow-lg p-5 bg-light">
+          <div class="text-center">
+            <h3 class="text-primary">Transaction</h3>
+          </div>
+          <form onSubmit="return checkPassword(event);" method="post">
+            <div class="p-4">
+              <!-- Bank Account number -->
+              <div class="input-group mb-3">
+                <span class="input-group-text bg-primary">
+                  <i class="bi bi-bank text-white"></i>
+                </span>
+                <input id="accountNumber" name="accountNumber" type="text" class="form-control"
+                placeholder="Account Number">
+              </div>
+              <div class="text-center">
+                <button class="btn btn-primary text-center mt-2" type="submit">
+                  Submit
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
 </html>

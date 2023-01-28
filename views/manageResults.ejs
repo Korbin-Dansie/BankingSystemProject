@@ -1,10 +1,53 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Manage Results</title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    Some sort of webpage here to manage results.
-  </body>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Select</title>
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="font/bootstrap-icons.css" />
+</head>
+
+<body>
+  <div class="container-fluid vh-100" style="margin-top:10px">
+    <div class="" style="margin-top:100px">
+      <div class="rounded d-flex justify-content-center">
+        <div class="col-md-4 col-sm-12 shadow-lg p-5 bg-light">
+          <div class="text-center">
+            <h3 class="text-primary">Bank</h3>
+            <h3 class="text-primary">Manage User Permissions</h3>
+            <h4 class="text-primary">For account - ######</h4>
+
+          </div>
+          <form method="post">
+            <div class="p-4">
+              <!-- Education -->
+              <div class="input-group mb-3"> 
+                <span class="input-group-text bg-primary">
+                    <i class="bi bi-check-square-fill text-white"></i>
+                </span>
+  
+                <select id="administration" name="administration" class="form-select" required>
+                    <option hidden disabled selected value> -- administration -- </option>
+                    <option value="Customer">Customer</option>
+                    <option value="Employee">Employee</option>
+                    <option value="Admin">Admin</option>
+                  </select>
+                </div>
+              <!-- Endof Personal Addition -->
+              <!-- This is the password that gets sent even though they are hidden -->
+              <div class="text-center">
+                <button class="btn btn-primary text-center mt-2" type="submit">
+                  Submit
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
 </html>

@@ -6,4 +6,9 @@ router.get('/', function(req, res, next) {
   res.render('transactPage', { });
 });
 
+
+router.post('/', function(req, res, next) {
+  res.render('transactPageResults', { });
+});
+
 module.exports = router;

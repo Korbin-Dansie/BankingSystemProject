@@ -49,9 +49,9 @@
                 <input id="password2" type="password" class="form-control" placeholder="Re-enter Password">
               </div>
               <div>
-                <p id="message" class="text-danger" style="height:25px">
+                <!-- <p id="message" class="text-danger" style="height:25px">
                   <%- locals.message %>
-                </p>
+                </p> -->
               </div>
               <!-- Personal Addtion -->
               <!-- Email -->
@@ -70,6 +70,10 @@
                   Create Account
                 </button>
               </div>
+              <% if (typeof message != 'undefined') { %>
+                <div class="text-center" style="height:25px"><%=message%> </div>
+                    <% } %>
+      
             </div>
           </form>
         </div>

@@ -6,4 +6,10 @@ router.get('/', function(req, res, next) {
   res.render('transfer', { });
 });
 
+
+/* GET home page. */
+router.post('/', function(req, res, next) {
+  res.render('transfer', { message: "You have succesfuly transfered funds"});
+});
+
 module.exports = router;
