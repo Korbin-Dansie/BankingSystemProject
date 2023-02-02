@@ -10,5 +10,5 @@ router.get('/', function(req, res, next) {
 /* POST home page. */
 router.post('/', function(req, res, next) {
   res.render('landingPage', { });
-});
+}); 
 module.exports = router;
