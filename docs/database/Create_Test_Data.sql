@@ -16,46 +16,69 @@ CALL `banking_system_project`.`insert_account_type`('savings');
 ***************************************************************/
 SELECT '******* Insert test user *******' as ' ';
 
-SET @MainAccountNumber = 0;
+SET @accountNumber1 = 0;
+SET @accountNumber2 = 0;
+SET @accountNumber3 = 0;
 
 CALL `create_user`
 ('Korbin',
  'Dansie',
- '$2a$04$e7CrQ6mc2a5N7B3tc2BkVef36Y8IV7ecc1ORNhqoZ5mOk9iwRzzmy',
- 'cvHxm,$rBeiofcx$tv,m^wg3ea[pc#vbi#o4rkjDnfgdSa#;l3%9opretmcv/^VwAe',
+ 'MySuperSecurePassword',
+ 'MySuperSecureSalt',
  1,
- @MainAccountNumber);
- SELECT @MainAccountNumber;
+ @accountNumber1);
+  CALL `create_user`
+('Briella',
+ 'Rutherford',
+ 'FinalTestPersonPassword',
+ 'FinalTestSalt',
+ 1,
+ @accountNumber2);
+ CALL `create_user`
+('Bradley',
+ 'Peterson',
+ 'SomeOtherPassword',
+ 'SomeOtherSalt',
+ 1,
+ @accountNumber3);
+
  
+SELECT '******* Check credentials *******' as '';
+CALL `check_credentials`(@accountNumber1, 'MySuperSecurePassword');
+
+
+CALL `check_credentials`(@accountNumber1, 'NotMypassword');
+
+
 /***************************************************************
 * test transfer
 ***************************************************************/
-SELECT '******* test transfer *******' as '';
+SELECT '******* Deposit 200 *******' as '';
 SET @TransferSuccess = 0;
-CALL `transfer`(@MainAccountNumber, 2, @MainAccountNumber, 1, 10.00, "Deposit 10  into 1", @TransferSuccess);
-CALL `transfer`(@MainAccountNumber, 1, @MainAccountNumber, 2, 8.00, "Withdraw 8 from 1", @TransferSuccess);
-SELECT @TransferSuccess;
+CALL `deposit`(@accountNumber1, 1, 200, "A deposit", @TransferSuccess);
 
-SELECT '******* Get Balance *******' as '';
-SET @balance = 0;
-CALL `sum_transaction`(@MainAccountNumber, 1, @balance);
-SELECT @balance;
+SELECT '******* Transfer 9.99 *******' as '';
+CALL `transfer`(@accountNumber1, 1, @accountNumber1, 2, 9.99, "A transfer", @TransferSuccess);
+CALL `get_account_balance`(@accountNumber1);
 
-SELECT '******* Get After deposit 200 *******' as '';
+SELECT '******* Withdraw 90.01 *******' as '';
 SET @TransferSuccess = 0;
-CALL `deposit`(@MainAccountNumber, 1, 200, NULL, @TransferSuccess);
-SELECT @TransferSuccess;
-SET @balance = 0;
-CALL `sum_transaction`(@MainAccountNumber, 1, @balance);
-SELECT @balance;
+CALL `withdraw`(@accountNumber1, 1, 90.01, "A withdraw", @TransferSuccess);
+CALL `get_account_balance`(@accountNumber1);
 
-SELECT '******* Get After withdraw 10.01 *******' as '';
+SELECT '******* Atempt (should fail) to withdraw a million dollars *******' as '';
 SET @TransferSuccess = 0;
-CALL `withdraw`(@MainAccountNumber, 1, 10.01, NULL, @TransferSuccess);
-SELECT @TransferSuccess;
-SET @balance = 0;
-CALL `sum_transaction`(@MainAccountNumber, 1, @balance);
-SELECT @balance;
+CALL `withdraw`(@accountNumber1, 2, 1000000, "Im a rich", @TransferSuccess);
+CALL `get_account_balance`(@accountNumber1);
 
-SELECT '******* Summ all accounts *******' as '';
-CALL `get_account_balance`(@MainAccountNumber);
+SELECT '******* Transfer money into another person account *******' as '';
+CALL `transfer`(@accountNumber1, 1, @accountNumber2, 2, 1.00, "Take a dollar", @TransferSuccess);
+CALL `get_account_balance`(@accountNumber1);
+CALL `get_account_balance`(@accountNumber2);
+
+CALL `transfer`(@accountNumber1, 1, @accountNumber1, 1, 1.00, "Transfer to myself", @TransferSuccess);
+
+SELECT '******* Show transaction history *******' as '';
+CALL `get_account_transaction_history`(@accountNumber1);
+
+
