@@ -17,6 +17,8 @@ DROP PROCEDURE IF EXISTS `create_user`;					-- Create a user, account number, an
 
 DROP PROCEDURE IF EXISTS `insert_account_type`;			-- Create a new sub type of bank account 
 DROP PROCEDURE IF EXISTS `insert_user_type`;			-- Create a new user type
+DROP PROCEDURE IF EXISTS `change_user_type`;			-- Create a new user type
+
 
 DROP PROCEDURE IF EXISTS `getAccountID`;				-- Returns account.account_id
 
@@ -210,6 +212,23 @@ CREATE PROCEDURE IF NOT EXISTS`insert_user_type`(
   	);
   END$$
 DELIMITER ;
+
+/***************************************************************
+* Create change_user_type
+***************************************************************/
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS `change_user_type`(IN accountNumber INT, IN userType VARCHAR(255))
+    BEGIN
+    	UPDATE `user` as u
+        INNER JOIN account_number as an ON an.user_id = u.user_id
+        SET
+    		user_role_id = (SELECT user_type_id FROM user_type where user_type = userType)
+    	WHERE
+    		an.account_number = accountNumber
+    	LIMIT 1;
+    END$$
+DELIMITER ;
+
 
 /***************************************************************
 * Create insert_account_type
@@ -429,22 +448,40 @@ DELIMITER ;
 ***************************************************************/
 DELIMITER $$
 CREATE PROCEDURE IF NOT EXISTS `get_transaction_history`(
-	IN accountId INT
+	IN accountNumber 	INT,
+	IN accountType		TINYINT
 )
 BEGIN 
-
+	SELECT a.account_type_id, 
+    -- Determines if the amount is a deposit (1) or withdraw (0)
+    CASE
+		WHEN a.account_id = t.to_account_id	THEN 1
+        ELSE 0
+	END AS 'isDeposit',
+    t.transaction_amount, t.memo, t.transaction_time
+	FROM account_number AS an
+    INNER JOIN `account` as a ON a.account_number = an.account_number
+    INNER JOIN `transaction` as t ON ((t.from_account_id = a.account_id) OR (t.to_account_id = a.account_id))
+    WHERE an.account_number = accountNumber AND a.account_type_id = accountType;
 END$$
 
 DELIMITER ;
 /***************************************************************
 * Create get_account_balance
+* returns a table of all the transactions for a user
 ***************************************************************/
 DELIMITER $$
 CREATE PROCEDURE IF NOT EXISTS `get_account_transaction_history`(
 	IN accountNumber INT
 )
 BEGIN 
-	SELECT a.account_type_id, a.account_id, t.from_account_id, t.to_account_id, t.transaction_amount, t.memo, t.transaction_time
+	SELECT a.account_type_id, 
+    -- Determines if the amount is a deposit (1) or withdraw (0)
+    CASE
+		WHEN a.account_id = t.to_account_id	THEN 1
+        ELSE 0
+	END AS 'isDeposit',
+    t.transaction_amount, t.memo, t.transaction_time
 	FROM account_number AS an
     INNER JOIN `account` as a ON a.account_number = an.account_number
     INNER JOIN `transaction` as t ON ((t.from_account_id = a.account_id) OR (t.to_account_id = a.account_id))

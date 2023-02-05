@@ -42,13 +42,20 @@ CALL `create_user`
  1,
  @accountNumber3);
 
- 
-SELECT '******* Check credentials *******' as '';
+/***************************************************************
+* Admin commands
+***************************************************************/
+SELECT '******* Check credentials (pass then fail) *******' as '';
 CALL `check_credentials`(@accountNumber1, 'MySuperSecurePassword');
-
 
 CALL `check_credentials`(@accountNumber1, 'NotMypassword');
 
+SELECT '******* Check users *******' as '';
+CALL `change_user_type`(@accountNumber1, 'admin');
+CALL `change_user_type`(@accountNumber2, 'employee');
+CALL `change_user_type`(@accountNumber3, 'customer');
+
+SELECT * FROM `user`;
 
 /***************************************************************
 * test transfer
@@ -80,5 +87,4 @@ CALL `transfer`(@accountNumber1, 1, @accountNumber1, 1, 1.00, "Transfer to mysel
 
 SELECT '******* Show transaction history *******' as '';
 CALL `get_account_transaction_history`(@accountNumber1);
-
-
+CALL `get_transaction_history`(@accountNumber2, 2);
