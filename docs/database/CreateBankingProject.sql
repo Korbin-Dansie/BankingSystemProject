@@ -1,31 +1,46 @@
 CREATE DATABASE IF NOT EXISTS `banking_system_project`; 
 USE `banking_system_project`;
 
-DROP TABLE IF EXISTS `account`;
-DROP TABLE IF EXISTS `account_number`;
-DROP TABLE IF EXISTS `account_type`;
-DROP TABLE IF EXISTS `transaction`;
-DROP TABLE IF EXISTS `user`;
-DROP TABLE IF EXISTS `user_type`;
+SET foreign_key_checks = 0;
+DROP TABLE IF EXISTS `transaction`;		-- Handles Transactions
+DROP TABLE IF EXISTS `account`;			-- Is the sub accounts linked to a account number
+DROP TABLE IF EXISTS `account_type`;	-- Savings or Checkings
+DROP TABLE IF EXISTS `account_number`;	-- The account number assosiated with a user
+DROP TABLE IF EXISTS `user`;			-- All people in our db that includes customer and employees
+DROP TABLE IF EXISTS `user_type`;		-- Customer, Employee, Admin
+SET foreign_key_checks = 1;
 
-DROP PROCEDURE IF EXISTS `create_account`;
-DROP PROCEDURE IF EXISTS `create_account_number`;
-DROP PROCEDURE IF EXISTS `create_user`;
-DROP PROCEDURE IF EXISTS `getAccountID`;
-DROP PROCEDURE IF EXISTS `insert_account_type`;
-DROP PROCEDURE IF EXISTS `insert_user_type`;
-DROP PROCEDURE IF EXISTS `sum_transaction`;
-DROP PROCEDURE IF EXISTS `transfer`;
+
+DROP PROCEDURE IF EXISTS `create_account`;				-- Create a sub account
+DROP PROCEDURE IF EXISTS `create_account_number`;		-- Create a account number
+DROP PROCEDURE IF EXISTS `create_user`;					-- Create a user, account number, and two sub accounts
+
+DROP PROCEDURE IF EXISTS `insert_account_type`;			-- Create a new sub type of bank account 
+DROP PROCEDURE IF EXISTS `insert_user_type`;			-- Create a new user type
+
+DROP PROCEDURE IF EXISTS `getAccountID`;				-- Returns account.account_id
+
+DROP PROCEDURE IF EXISTS `get_balance`;					-- Retruns balance from account number and type
+DROP PROCEDURE IF EXISTS `get_balance_by_account_id`;	-- Returns balance from account_id
+DROP PROCEDURE IF EXISTS `get_account_balance`;			-- Returns table of all the accounts balances
+
+DROP PROCEDURE IF EXISTS `transfer`;					-- Transfer money from one user to another
+DROP PROCEDURE IF EXISTS `deposit`;						-- Deposit money into an account
+DROP PROCEDURE IF EXISTS `withdraw`;					-- Withdraw money from an account
+
+DROP PROCEDURE IF EXISTS `check_credentials`;			-- check if account number and hashed_password match
+ DROP PROCEDURE IF EXISTS `get_salt`;					-- Get the salt from the user with the account number
+
 
 /***************************************************************
 * Create user_type
 ***************************************************************/
 
 CREATE TABLE IF NOT EXISTS `user_type` (
-  `user_type_id` TINYINT NOT NULL AUTO_INCREMENT,
-  `user_type` VARCHAR(25) NOT NULL,
-  PRIMARY KEY (`user_type_id`)
-) COMMENT='customer, employee, admin';
+    `user_type_id` TINYINT NOT NULL AUTO_INCREMENT,
+    `user_type` VARCHAR(25) NOT NULL,
+    PRIMARY KEY (`user_type_id`)
+)  COMMENT='customer, employee, admin';
 
 /***************************************************************
 * Create user
@@ -271,10 +286,10 @@ CREATE PROCEDURE IF NOT EXISTS`transfer`(
 DELIMITER ;
 
 /***************************************************************
-* Create sum_transactions
+* Create get_balance
 ***************************************************************/
 DELIMITER $$
-CREATE PROCEDURE IF NOT EXISTS `sum_transaction`(
+CREATE PROCEDURE IF NOT EXISTS `get_balance`(
 	IN accountNumber	INT,
     IN accountType		TINYINT,
     OUT balance			DECIMAL(10,2)
@@ -286,8 +301,8 @@ CREATE PROCEDURE IF NOT EXISTS `sum_transaction`(
 
 	CALL `getAccountID`(accountNumber, accountType, accountID);
   	
-	SELECT SUM(tt.transaction_amount) FROM 
-	account_number AS an
+	SELECT SUM(tt.transaction_amount) 
+    FROM account_number AS an
 	INNER JOIN `account` AS a on a.account_number = an.account_number
 	INNER JOIN `transaction` AS tt on tt.to_account_id = a.account_id
 	WHERE a.account_id = accountID INTO deposits;
@@ -302,3 +317,140 @@ CREATE PROCEDURE IF NOT EXISTS `sum_transaction`(
 	SELECT deposits-withdraws INTO balance;
   END$$
 DELIMITER ;
+
+/***************************************************************
+* Create get_balance_by_account_id
+***************************************************************/
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS `get_balance_by_account_id`(
+	IN accountID		INT,
+    OUT balance			DECIMAL(10,2)
+  )
+  BEGIN
+    DECLARE deposits 	DECIMAL(10,2) DEFAULT 20;
+	DECLARE withdraws 	DECIMAL(10,2) DEFAULT 1;
+  	
+	SELECT SUM(tt.transaction_amount) FROM 
+	`transaction` AS tt
+	WHERE tt.to_account_id = accountID INTO deposits;
+    
+	SELECT SUM(ft.transaction_amount) FROM 
+	`transaction` AS ft
+	WHERE ft.from_account_id = accountID INTO withdraws;
+    
+    -- Withdraws need to be negitive
+	SELECT deposits-withdraws INTO balance;
+  END$$
+DELIMITER ;
+
+/***************************************************************
+* Create deposit
+***************************************************************/
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS `deposit`(
+	IN toAccountNumber		INT,
+    IN toAccountType		TINYINT,
+    IN amount				DECIMAL(10,2),
+    IN memo					VARCHAR(255),
+    OUT result				TINYINT
+  )
+  BEGIN
+	CALL `banking_system_project`.`transfer`(NULL, NULL, toAccountNumber, toAccountType, amount, memo, result);
+  END$$
+DELIMITER ;
+
+/***************************************************************
+* Create withdraw
+***************************************************************/
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS `withdraw`(
+	IN fromAccountNumber	INT,
+    IN fromAccountType		TINYINT,
+    IN amount				DECIMAL(10,2),
+    IN memo					VARCHAR(255),
+    OUT result				TINYINT
+  )
+  BEGIN
+	CALL `banking_system_project`.`transfer`(fromAccountNumber, fromAccountType, NULL, NULL, amount, memo, result);
+  END$$
+DELIMITER ;
+
+/***************************************************************
+* Create get_account_balance
+***************************************************************/
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS `get_account_balance`(
+	IN accountNumber	INT
+	)
+	BEGIN
+		DECLARE amount DECIMAL(10,2);
+        DECLARE finished INTEGER DEFAULT 0;
+        DECLARE _id INT;			-- Store account.account_id
+        DECLARE _typeid TINYINT;	-- Store account.account_type_id
+        DECLARE cur_balance
+			CURSOR FOR
+				SELECT a.account_id, a.account_type_id
+                FROM `account` AS a
+				WHERE a.account_number = accountNumber;
+		DECLARE CONTINUE HANDLER 
+			FOR NOT FOUND SET finished = 1;
+
+        
+		-- Create temp table
+        DROP TEMPORARY TABLE IF EXISTS balance_table;
+        CREATE TEMPORARY TABLE balance_table(account_type TINYINT, balance DECIMAL(10,2));
+        
+        -- Loop through each sub-account
+        OPEN cur_balance;
+		
+        getBalance: LOOP
+			FETCH cur_balance INTO _id, _typeid;
+			IF finished = 1 THEN 
+				LEAVE getBalance;
+			END IF;
+            -- Call balance and insert it into current row
+            CALL `banking_system_project`.`get_balance_by_account_id`(_id, amount);
+            INSERT INTO balance_table(account_type, balance) VALUES (_id, amount);
+		END LOOP getBalance;
+        CLOSE cur_balance;
+        
+        
+        -- Insert the balance of sub account into temp table
+		SELECT *
+		FROM balance_table;
+		DROP TEMPORARY TABLE balance_table;
+	END$$
+DELIMITER ;
+
+/***************************************************************
+* Create check_credentials
+***************************************************************/
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS `check_credentials`(
+	IN accountNumber INT,
+	IN hashed_password VARCHAR(255)
+	)
+	BEGIN
+		SELECT EXISTS(
+			SELECT * 
+			FROM `user` AS u
+			INNER JOIN `account_number` AS an ON u.user_id = an.user_id
+			WHERE an.account_number = accountNumber AND u.hashed_password = hashed_password
+		) AS result;
+	END$$
+DELIMITER ;
+     
+/***************************************************************
+* Create get_salt
+***************************************************************/
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS `get_salt`(
+	IN accountNumber INT
+	)
+	BEGIN
+		SELECT u.salt FROM `user` AS u
+        INNER JOIN account_number AS an ON u.user_id = an.user_id
+        WHERE an.account_number = accountNumber;
+	END$$
+DELIMITER ;
+

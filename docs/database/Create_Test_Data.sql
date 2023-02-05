@@ -32,7 +32,7 @@ CALL `create_user`
 ***************************************************************/
 SELECT '******* test transfer *******' as '';
 SET @TransferSuccess = 0;
-CALL `transfer`(@MainAccountNumber, 2, @MainAccountNumber, 1, 10.00, "Deposit 10 into 1", @TransferSuccess);
+CALL `transfer`(@MainAccountNumber, 2, @MainAccountNumber, 1, 10.00, "Deposit 10  into 1", @TransferSuccess);
 CALL `transfer`(@MainAccountNumber, 1, @MainAccountNumber, 2, 8.00, "Withdraw 8 from 1", @TransferSuccess);
 SELECT @TransferSuccess;
 
@@ -41,3 +41,21 @@ SET @balance = 0;
 CALL `sum_transaction`(@MainAccountNumber, 1, @balance);
 SELECT @balance;
 
+SELECT '******* Get After deposit 200 *******' as '';
+SET @TransferSuccess = 0;
+CALL `deposit`(@MainAccountNumber, 1, 200, NULL, @TransferSuccess);
+SELECT @TransferSuccess;
+SET @balance = 0;
+CALL `sum_transaction`(@MainAccountNumber, 1, @balance);
+SELECT @balance;
+
+SELECT '******* Get After withdraw 10.01 *******' as '';
+SET @TransferSuccess = 0;
+CALL `withdraw`(@MainAccountNumber, 1, 10.01, NULL, @TransferSuccess);
+SELECT @TransferSuccess;
+SET @balance = 0;
+CALL `sum_transaction`(@MainAccountNumber, 1, @balance);
+SELECT @balance;
+
+SELECT '******* Summ all accounts *******' as '';
+CALL `get_account_balance`(@MainAccountNumber);
