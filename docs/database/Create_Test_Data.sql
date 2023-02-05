@@ -3,7 +3,7 @@ USE `banking_system_project`;
 /***************************************************************
 * Create roles / types
 ***************************************************************/
-SELECT '******* Create roles / types *******' as ' ';
+SELECT '******* Create roles / types *******' as '';
 CALL `banking_system_project`.`insert_user_type`('customer');
 CALL `banking_system_project`.`insert_user_type`('employee');
 CALL `banking_system_project`.`insert_user_type`('admin');
@@ -14,7 +14,7 @@ CALL `banking_system_project`.`insert_account_type`('savings');
 /***************************************************************
 * Insert test user
 ***************************************************************/
-SELECT '******* Insert test user *******' as ' ';
+SELECT '******* Insert test user *******' as '';
 
 SET @accountNumber1 = 0;
 SET @accountNumber2 = 0;
