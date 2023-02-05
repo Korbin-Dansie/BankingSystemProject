@@ -24,6 +24,10 @@ DROP PROCEDURE IF EXISTS `get_balance`;					-- Retruns balance from account numb
 DROP PROCEDURE IF EXISTS `get_balance_by_account_id`;	-- Returns balance from account_id
 DROP PROCEDURE IF EXISTS `get_account_balance`;			-- Returns table of all the accounts balances
 
+DROP PROCEDURE IF EXISTS `get_transaction_history`;			-- Return a table of all the transaction a sub account has done
+DROP PROCEDURE IF EXISTS `get_account_transaction_history`;	-- Returns all the transactions a user has done
+
+
 DROP PROCEDURE IF EXISTS `transfer`;					-- Transfer money from one user to another
 DROP PROCEDURE IF EXISTS `deposit`;						-- Deposit money into an account
 DROP PROCEDURE IF EXISTS `withdraw`;					-- Withdraw money from an account
@@ -246,6 +250,54 @@ CREATE PROCEDURE IF NOT EXISTS `getAccountID`(
 DELIMITER ;
 
 /***************************************************************
+* Create get_balance
+***************************************************************/
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS `get_balance`(
+	IN accountNumber	INT,
+    IN accountType		TINYINT,
+    OUT balance			DECIMAL(10,2)
+  )
+  BEGIN
+	DECLARE accountID 	INT DEFAULT 0;
+    DECLARE deposits 	DECIMAL(10,2) DEFAULT 20;
+	DECLARE withdraws 	DECIMAL(10,2) DEFAULT 1;
+
+	CALL `getAccountID`(accountNumber, accountType, accountID);
+    CALL `get_balance_by_account_id`(accountID, balance);
+  END$$
+DELIMITER ;
+
+/***************************************************************
+* Create get_balance_by_account_id
+***************************************************************/
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS `get_balance_by_account_id`(
+	IN accountID		INT,
+    OUT balance			DECIMAL(10,2)
+  )
+  BEGIN
+    DECLARE deposits 	DECIMAL(10,2) DEFAULT 0;
+	DECLARE withdraws 	DECIMAL(10,2) DEFAULT 0;
+  	
+    
+	SELECT SUM(tt.transaction_amount) FROM 
+	`transaction` AS tt
+	WHERE tt.to_account_id = accountID INTO deposits;
+    
+	SELECT SUM(ft.transaction_amount) FROM 
+	`transaction` AS ft
+	WHERE ft.from_account_id = accountID INTO withdraws;
+    
+    IF deposits IS NULL THEN SET deposits = 0; END IF;
+	IF withdraws IS NULL THEN SET withdraws = 0; END IF;
+
+    -- Withdraws need to be negitive
+	SELECT deposits-withdraws INTO balance;
+  END$$
+DELIMITER ;
+
+/***************************************************************
 * Create transfer
 * If values are not put in then the transfer is a 
 * deposit / withdraw at the bank. 
@@ -261,85 +313,35 @@ CREATE PROCEDURE IF NOT EXISTS`transfer`(
     IN memo					VARCHAR(255),
     OUT result				TINYINT
   )
-  BEGIN
-      DECLARE fromAccountId INT;
-      DECLARE toAccountId INT;
+	BEGIN
+		DECLARE fromAccountId INT;
+		DECLARE toAccountId 	INT;
+		DECLARE balance		DECIMAL(10,2);
       
-      CALL `getAccountID`(fromAccountNumber, fromAccountType, fromAccountId);
-      CALL `getAccountID`(toAccountNumber, toAccountType, toAccountId);
-  	-- Check the balance of the from account
+		CALL `getAccountID`(fromAccountNumber, fromAccountType, fromAccountId);
+		CALL `getAccountID`(toAccountNumber, toAccountType, toAccountId);
+		-- Check the balance of the from account
+		CALL `get_balance_by_account_id`(fromAccountId, balance);
     
-    -- Transfer the money
-    INSERT INTO `transaction`
-	(`from_account_id`,
-	`to_account_id`,
-	`transaction_amount`,
-	`memo`)
-	VALUES
-	(fromAccountId,
-	toAccountId,
-	amount,
-	memo);
-    
-    SELECT 1 INTO result;
-  END$$
-DELIMITER ;
-
-/***************************************************************
-* Create get_balance
-***************************************************************/
-DELIMITER $$
-CREATE PROCEDURE IF NOT EXISTS `get_balance`(
-	IN accountNumber	INT,
-    IN accountType		TINYINT,
-    OUT balance			DECIMAL(10,2)
-  )
-  BEGIN
-	DECLARE accountID 	INT DEFAULT 0;
-    DECLARE deposits 	DECIMAL(10,2) DEFAULT 20;
-	DECLARE withdraws 	DECIMAL(10,2) DEFAULT 1;
-
-	CALL `getAccountID`(accountNumber, accountType, accountID);
-  	
-	SELECT SUM(tt.transaction_amount) 
-    FROM account_number AS an
-	INNER JOIN `account` AS a on a.account_number = an.account_number
-	INNER JOIN `transaction` AS tt on tt.to_account_id = a.account_id
-	WHERE a.account_id = accountID INTO deposits;
-    
-	SELECT SUM(ft.transaction_amount) FROM 
-	account_number AS an
-	INNER JOIN `account` AS a on a.account_number = an.account_number
-	INNER JOIN `transaction` AS ft on ft.from_account_id = a.account_id
-	WHERE a.account_id = accountID INTO withdraws;
-    
-    -- Withdraws need to be negitive
-	SELECT deposits-withdraws INTO balance;
-  END$$
-DELIMITER ;
-
-/***************************************************************
-* Create get_balance_by_account_id
-***************************************************************/
-DELIMITER $$
-CREATE PROCEDURE IF NOT EXISTS `get_balance_by_account_id`(
-	IN accountID		INT,
-    OUT balance			DECIMAL(10,2)
-  )
-  BEGIN
-    DECLARE deposits 	DECIMAL(10,2) DEFAULT 20;
-	DECLARE withdraws 	DECIMAL(10,2) DEFAULT 1;
-  	
-	SELECT SUM(tt.transaction_amount) FROM 
-	`transaction` AS tt
-	WHERE tt.to_account_id = accountID INTO deposits;
-    
-	SELECT SUM(ft.transaction_amount) FROM 
-	`transaction` AS ft
-	WHERE ft.from_account_id = accountID INTO withdraws;
-    
-    -- Withdraws need to be negitive
-	SELECT deposits-withdraws INTO balance;
+		-- If amount is greater than from account balance return 0. If there is no from account then its a deposit
+        -- or trying to tranfer money to the same account
+		IF (((amount > balance) AND (fromAccountId IS NOT NULL)) OR fromAccountId = toAccountId) THEN
+			SELECT 0 INTO result;
+		ELSE
+			-- Transfer the money
+			INSERT INTO `transaction`
+			(`from_account_id`,
+			`to_account_id`,
+			`transaction_amount`,
+			`memo`)
+			VALUES
+			(fromAccountId,
+			toAccountId,
+			amount,
+			memo);    
+            
+			SELECT 1 INTO result;
+		END IF;
   END$$
 DELIMITER ;
 
@@ -383,7 +385,7 @@ CREATE PROCEDURE IF NOT EXISTS `get_account_balance`(
 	IN accountNumber	INT
 	)
 	BEGIN
-		DECLARE amount DECIMAL(10,2);
+		DECLARE amount DECIMAL(10,2) DEFAULT 0;
         DECLARE finished INTEGER DEFAULT 0;
         DECLARE _id INT;			-- Store account.account_id
         DECLARE _typeid TINYINT;	-- Store account.account_type_id
@@ -410,7 +412,7 @@ CREATE PROCEDURE IF NOT EXISTS `get_account_balance`(
 			END IF;
             -- Call balance and insert it into current row
             CALL `banking_system_project`.`get_balance_by_account_id`(_id, amount);
-            INSERT INTO balance_table(account_type, balance) VALUES (_id, amount);
+            INSERT INTO balance_table(account_type, balance) VALUES (_typeid, amount);
 		END LOOP getBalance;
         CLOSE cur_balance;
         
@@ -422,6 +424,33 @@ CREATE PROCEDURE IF NOT EXISTS `get_account_balance`(
 	END$$
 DELIMITER ;
 
+/***************************************************************
+* Create get_account_balance
+***************************************************************/
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS `get_transaction_history`(
+	IN accountId INT
+)
+BEGIN 
+
+END$$
+
+DELIMITER ;
+/***************************************************************
+* Create get_account_balance
+***************************************************************/
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS `get_account_transaction_history`(
+	IN accountNumber INT
+)
+BEGIN 
+	SELECT a.account_type_id, a.account_id, t.from_account_id, t.to_account_id, t.transaction_amount, t.memo, t.transaction_time
+	FROM account_number AS an
+    INNER JOIN `account` as a ON a.account_number = an.account_number
+    INNER JOIN `transaction` as t ON ((t.from_account_id = a.account_id) OR (t.to_account_id = a.account_id))
+    WHERE an.account_number = accountNumber;
+END$$
+DELIMITER ;
 /***************************************************************
 * Create check_credentials
 ***************************************************************/
