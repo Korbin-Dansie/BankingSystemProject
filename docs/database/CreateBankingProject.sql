@@ -1,11 +1,26 @@
-DROP DATABASE IF EXISTS `banking_system_project`; 
 CREATE DATABASE IF NOT EXISTS `banking_system_project`; 
-
 USE `banking_system_project`;
+
+DROP TABLE IF EXISTS `account`;
+DROP TABLE IF EXISTS `account_number`;
+DROP TABLE IF EXISTS `account_type`;
+DROP TABLE IF EXISTS `transaction`;
+DROP TABLE IF EXISTS `user`;
+DROP TABLE IF EXISTS `user_type`;
+
+DROP PROCEDURE IF EXISTS `create_account`;
+DROP PROCEDURE IF EXISTS `create_account_number`;
+DROP PROCEDURE IF EXISTS `create_user`;
+DROP PROCEDURE IF EXISTS `getAccountID`;
+DROP PROCEDURE IF EXISTS `insert_account_type`;
+DROP PROCEDURE IF EXISTS `insert_user_type`;
+DROP PROCEDURE IF EXISTS `sum_transaction`;
+DROP PROCEDURE IF EXISTS `transfer`;
 
 /***************************************************************
 * Create user_type
 ***************************************************************/
+
 CREATE TABLE IF NOT EXISTS `user_type` (
   `user_type_id` TINYINT NOT NULL AUTO_INCREMENT,
   `user_type` VARCHAR(25) NOT NULL,
@@ -212,7 +227,6 @@ CREATE PROCEDURE IF NOT EXISTS `getAccountID`(
     a.account_type_id = account_type
     INTO account_ID;
     
-    SELECT account_ID;
   END$$
 DELIMITER ;
 
