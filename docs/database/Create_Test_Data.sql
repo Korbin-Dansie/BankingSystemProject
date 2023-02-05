@@ -1,5 +1,7 @@
 USE `banking_system_project`;
-
+/***************************************************************
+* Create roles / types
+***************************************************************/
 CALL `banking_system_project`.`insert_user_type`('customer');
 CALL `banking_system_project`.`insert_user_type`('employee');
 CALL `banking_system_project`.`insert_user_type`('admin');
@@ -7,7 +9,9 @@ CALL `banking_system_project`.`insert_user_type`('admin');
 CALL `banking_system_project`.`insert_account_type`('checkings');
 CALL `banking_system_project`.`insert_account_type`('savings');
 
-
+/***************************************************************
+* Insert test user
+***************************************************************/
 SET @MainAccountNumber = 0;
 CALL `create_user`
 ('Korbin',
@@ -17,4 +21,12 @@ CALL `create_user`
  1,
  @MainAccountNumber);
  
- SELECT @MainAccountNumber FROM DUAL;
+/***************************************************************
+* Insert test user
+***************************************************************/
+SET @TransferSuccess = 0;
+CALL `transfer`(@MainAccountNumber, 1, @MainAccountNumber, 2, 10.00, "This is my memo", @TransferSuccess);
+SELECT @TransferSuccess;
+
+CALL `sum_transaction`(@MainAccountNumber, 1);
+

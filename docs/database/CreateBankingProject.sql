@@ -181,7 +181,7 @@ DELIMITER ;
 * Create insert_account_type
 ***************************************************************/
 DELIMITER $$
-CREATE PROCEDURE IF NOT EXISTS`insert_account_type`(
+CREATE PROCEDURE IF NOT EXISTS `insert_account_type`(
 	IN account_type_name VARCHAR(25)
   )
   BEGIN
@@ -191,5 +191,87 @@ CREATE PROCEDURE IF NOT EXISTS`insert_account_type`(
 		SELECT * FROM `account_type`
 	WHERE account_type.account_type=account_type_name LIMIT 1
   	);
+  END$$
+DELIMITER ;
+
+/***************************************************************
+* Create getAccountId
+***************************************************************/
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS `getAccountID`(
+	IN account_number 	INT,
+    IN account_type		TINYINT,
+    OUT account_ID		INT
+  )
+  BEGIN
+	
+  	SELECT a.account_id 
+    FROM `account` AS a
+    WHERE 
+    a.account_number = account_number AND
+    a.account_type_id = account_type
+    INTO account_ID;
+    
+    SELECT account_ID;
+  END$$
+DELIMITER ;
+
+/***************************************************************
+* Create transfer
+* If values are not put in then the transfer is a 
+* deposit / withdraw at the bank. 
+* Returns 1 for true. Returns 0 if there is an error 
+***************************************************************/
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS`transfer`(
+	IN fromAccountNumber	INT,
+    IN fromAccountType		TINYINT,
+	IN toAccountNumber		INT,
+    IN toAccountType		TINYINT,
+    IN amount				DECIMAL(10,2),
+    IN memo					VARCHAR(255),
+    OUT result				TINYINT
+  )
+  BEGIN
+      DECLARE fromAccountId INT DEFAULT 1;
+      DECLARE toAccountId INT DEFAULT 1;
+      
+      CALL `getAccountID`(fromAccountNumber, fromAccountType, @fromAccountId);
+      CALL `getAccountID`(toAccountNumber, toAccountType, @toAccountId);
+  	-- Check the balance of the from account
+    
+    -- Transfer the money
+    INSERT INTO `transaction`
+	(`from_account_id`,
+	`to_account_id`,
+	`transaction_amount`,
+	`memo`)
+	VALUES
+	(fromAccountId,
+	toAccountId,
+	amount,
+	memo);
+    
+    SELECT 1 INTO result;
+  END$$
+DELIMITER ;
+
+/***************************************************************
+* Create sum_transactions
+***************************************************************/
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS `sum_transaction`(
+	IN accountNumber INT,
+    IN accountType TINYINT
+  )
+  BEGIN
+	DECLARE accountID INT DEFAULT 0;
+	CALL `getAccountID`(accountNumber, accountType, accountID);
+  	
+	SELECT * FROM 
+	account_number AS an
+	INNER JOIN `account` AS a on a.account_number = an.account_number
+	INNER JOIN `transaction` AS ft on ft.from_account_id = a.account_id
+	WHERE a.account_id = accountID;
   END$$
 DELIMITER ;
