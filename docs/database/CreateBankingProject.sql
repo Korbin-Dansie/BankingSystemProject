@@ -233,11 +233,11 @@ CREATE PROCEDURE IF NOT EXISTS`transfer`(
     OUT result				TINYINT
   )
   BEGIN
-      DECLARE fromAccountId INT DEFAULT 1;
-      DECLARE toAccountId INT DEFAULT 1;
+      DECLARE fromAccountId INT;
+      DECLARE toAccountId INT;
       
-      CALL `getAccountID`(fromAccountNumber, fromAccountType, @fromAccountId);
-      CALL `getAccountID`(toAccountNumber, toAccountType, @toAccountId);
+      CALL `getAccountID`(fromAccountNumber, fromAccountType, fromAccountId);
+      CALL `getAccountID`(toAccountNumber, toAccountType, toAccountId);
   	-- Check the balance of the from account
     
     -- Transfer the money
@@ -261,17 +261,30 @@ DELIMITER ;
 ***************************************************************/
 DELIMITER $$
 CREATE PROCEDURE IF NOT EXISTS `sum_transaction`(
-	IN accountNumber INT,
-    IN accountType TINYINT
+	IN accountNumber	INT,
+    IN accountType		TINYINT,
+    OUT balance			DECIMAL(10,2)
   )
   BEGIN
-	DECLARE accountID INT DEFAULT 0;
+	DECLARE accountID 	INT DEFAULT 0;
+    DECLARE deposits 	DECIMAL(10,2) DEFAULT 20;
+	DECLARE withdraws 	DECIMAL(10,2) DEFAULT 1;
+
 	CALL `getAccountID`(accountNumber, accountType, accountID);
   	
-	SELECT * FROM 
+	SELECT SUM(tt.transaction_amount) FROM 
+	account_number AS an
+	INNER JOIN `account` AS a on a.account_number = an.account_number
+	INNER JOIN `transaction` AS tt on tt.to_account_id = a.account_id
+	WHERE a.account_id = accountID INTO deposits;
+    
+	SELECT SUM(ft.transaction_amount) FROM 
 	account_number AS an
 	INNER JOIN `account` AS a on a.account_number = an.account_number
 	INNER JOIN `transaction` AS ft on ft.from_account_id = a.account_id
-	WHERE a.account_id = accountID;
+	WHERE a.account_id = accountID INTO withdraws;
+    
+    -- Withdraws need to be negitive
+	SELECT deposits-withdraws INTO balance;
   END$$
 DELIMITER ;

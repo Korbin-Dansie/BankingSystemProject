@@ -26,7 +26,11 @@ CALL `create_user`
 ***************************************************************/
 SET @TransferSuccess = 0;
 CALL `transfer`(@MainAccountNumber, 1, @MainAccountNumber, 2, 10.00, "This is my memo", @TransferSuccess);
+CALL `transfer`(@MainAccountNumber, 2, @MainAccountNumber, 1, 8.00, "This is my memo", @TransferSuccess);
+
 SELECT @TransferSuccess;
 
-CALL `sum_transaction`(@MainAccountNumber, 1);
+SET @balance = 0;
+CALL `sum_transaction`(@MainAccountNumber, 1, @balance);
+SELECT @balance;
 
