@@ -214,9 +214,6 @@ SELECT LAST_INSERT_ID() INTO accountNumber;
 END
 $$ DELIMITER ;
 
-
-
-
 /***************************************************************
  * Create getAccountId
  ***************************************************************/
@@ -487,5 +484,5 @@ SELECT u.salt
 FROM `user` AS u
   INNER JOIN account_number AS an ON u.user_id = an.user_id
 WHERE an.account_number = accountNumber;
-END $$ 
-DELIMITER ;
+END 
+$$ DELIMITER ;
