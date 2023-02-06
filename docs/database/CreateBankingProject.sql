@@ -10,23 +10,28 @@ DROP TABLE IF EXISTS `user`; -- All people in our db that includes customer and 
 DROP TABLE IF EXISTS `user_type`; -- Customer, Employee, Admin
 SET foreign_key_checks = 1;
 
-DROP PROCEDURE IF EXISTS `create_account`; -- Create a sub account
-DROP PROCEDURE IF EXISTS `create_account_number`; -- Create a account number
-DROP PROCEDURE IF EXISTS `create_user`; -- Create a user, account number, and two sub accounts
 DROP PROCEDURE IF EXISTS `insert_account_type`; -- Create a new sub type of bank account 
 DROP PROCEDURE IF EXISTS `insert_user_type`; -- Create a new user type
+
+DROP PROCEDURE IF EXISTS `create_user`; -- Create a user, account number, and two sub accounts
 DROP PROCEDURE IF EXISTS `change_user_type`; -- Create a new user type
+DROP PROCEDURE IF EXISTS `create_account`; -- Create a sub account
+DROP PROCEDURE IF EXISTS `create_account_number`; -- Create a account number
+
 DROP PROCEDURE IF EXISTS `getAccountID`; -- Returns account.account_id
 DROP PROCEDURE IF EXISTS `get_balance`; -- Retruns balance from account number and type
 DROP PROCEDURE IF EXISTS `get_balance_by_account_id`; -- Returns balance from account_id
 DROP PROCEDURE IF EXISTS `get_account_balance`; -- Returns table of all the accounts balances
-DROP PROCEDURE IF EXISTS `get_transaction_history`; -- Return a table of all the transaction a sub account has done
-DROP PROCEDURE IF EXISTS `get_account_transaction_history`; -- Returns all the transactions a user has done
+
 DROP PROCEDURE IF EXISTS `transfer`; -- Transfer money from one user to another
 DROP PROCEDURE IF EXISTS `deposit`; -- Deposit money into an account
 DROP PROCEDURE IF EXISTS `withdraw`; -- Withdraw money from an account
+DROP PROCEDURE IF EXISTS `get_transaction_history`; -- Return a table of all the transaction a sub account has done
+DROP PROCEDURE IF EXISTS `get_account_transaction_history`; -- Returns all the transactions a user has done
+
 DROP PROCEDURE IF EXISTS `check_credentials`; -- check if account number and hashed_password match
 DROP PROCEDURE IF EXISTS `get_salt`; -- Get the salt from the user with the account number
+
 /***************************************************************
  * Create user_type
  ***************************************************************/
@@ -99,7 +104,38 @@ CREATE TABLE IF NOT EXISTS `transaction` (
  * CREATE SP
  *
  *******************************************************************************************************************************/
-USE `banking_system_project`;
+/***************************************************************
+ * Create insert_account_type
+ ***************************************************************/
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS `insert_account_type`(IN account_type_name VARCHAR(25)) BEGIN
+INSERT INTO account_type(account_type)
+SELECT account_type_name
+FROM DUAL
+WHERE NOT EXISTS (
+    SELECT *
+    FROM `account_type`
+    WHERE account_type.account_type = account_type_name
+    LIMIT 1
+  );
+END
+$$ DELIMITER ;
+/***************************************************************
+ * Create insert_user_type
+ ***************************************************************/
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS `insert_user_type`(IN user_type_name VARCHAR(25)) BEGIN
+INSERT INTO user_type(user_type)
+SELECT user_type_name
+FROM DUAL
+WHERE NOT EXISTS (
+    SELECT *
+    FROM `user_type`
+    WHERE user_type.user_type = user_type_name
+    LIMIT 1
+  );
+END
+$$ DELIMITER ;
 /***************************************************************
  * Create create_user
  * Takes in all required params for creating a new user then
@@ -114,7 +150,8 @@ CREATE PROCEDURE IF NOT EXISTS `create_user`(
   IN salt VARCHAR(255),
   IN user_role_id TINYINT,
   OUT accountNumber int
-) BEGIN -- Create User account
+) 
+BEGIN -- Create User account
 INSERT INTO `user` (
     `user_first_name`,
     `user_last_name`,
@@ -139,44 +176,6 @@ SELECT @newAccountNumber INTO accountNumber;
 END
 $$ DELIMITER ;
 /***************************************************************
- * Create create_account_number
- ***************************************************************/
-DELIMITER $$
-CREATE PROCEDURE IF NOT EXISTS `create_account_number`(IN user_id int, OUT accountNumber int) BEGIN
-INSERT INTO `account_number` (`user_id`)
-VALUES (user_id);
-SELECT LAST_INSERT_ID() INTO accountNumber;
-END
-$$ DELIMITER ;
-/***************************************************************
- * Create create_account
- ***************************************************************/
-DELIMITER $$
-CREATE PROCEDURE IF NOT EXISTS `create_account`(
-  IN accountNumber int,
-  IN accountType tinyint
-) BEGIN
-INSERT INTO `account` (`account_number`, `account_type_id`)
-VALUES (accountNumber, accountType);
-END
-$$ DELIMITER ;
-/***************************************************************
- * Create insert_user_type
- ***************************************************************/
-DELIMITER $$
-CREATE PROCEDURE IF NOT EXISTS `insert_user_type`(IN user_type_name VARCHAR(25)) BEGIN
-INSERT INTO user_type(user_type)
-SELECT user_type_name
-FROM DUAL
-WHERE NOT EXISTS (
-    SELECT *
-    FROM `user_type`
-    WHERE user_type.user_type = user_type_name
-    LIMIT 1
-  );
-END
-$$ DELIMITER ;
-/***************************************************************
  * Create change_user_type
  ***************************************************************/
 DELIMITER $$
@@ -193,21 +192,31 @@ LIMIT 1;
 END
 $$ DELIMITER ;
 /***************************************************************
- * Create insert_account_type
+ * Create create_account
  ***************************************************************/
 DELIMITER $$
-CREATE PROCEDURE IF NOT EXISTS `insert_account_type`(IN account_type_name VARCHAR(25)) BEGIN
-INSERT INTO account_type(account_type)
-SELECT account_type_name
-FROM DUAL
-WHERE NOT EXISTS (
-    SELECT *
-    FROM `account_type`
-    WHERE account_type.account_type = account_type_name
-    LIMIT 1
-  );
+CREATE PROCEDURE IF NOT EXISTS `create_account`(
+  IN accountNumber int,
+  IN accountType tinyint
+) BEGIN
+INSERT INTO `account` (`account_number`, `account_type_id`)
+VALUES (accountNumber, accountType);
 END
 $$ DELIMITER ;
+/***************************************************************
+ * Create create_account_number
+ ***************************************************************/
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS `create_account_number`(IN user_id int, OUT accountNumber int) BEGIN
+INSERT INTO `account_number` (`user_id`)
+VALUES (user_id);
+SELECT LAST_INSERT_ID() INTO accountNumber;
+END
+$$ DELIMITER ;
+
+
+
+
 /***************************************************************
  * Create getAccountId
  ***************************************************************/
@@ -265,6 +274,46 @@ END IF;
 SELECT deposits - withdraws INTO balance;
 END
 $$ DELIMITER ;
+/***************************************************************
+ * Create get_account_balance
+ ***************************************************************/
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS `get_account_balance`(IN accountNumber INT) BEGIN
+DECLARE amount DECIMAL(10, 2) DEFAULT 0;
+DECLARE finished INTEGER DEFAULT 0;
+DECLARE _id INT;
+-- Store account.account_id
+DECLARE _typeid TINYINT;
+-- Store account.account_type_id
+DECLARE cur_balance CURSOR FOR
+SELECT a.account_id,
+  a.account_type_id
+FROM `account` AS a
+WHERE a.account_number = accountNumber;
+DECLARE CONTINUE HANDLER FOR NOT FOUND
+SET finished = 1;
+-- Create temp table
+DROP TEMPORARY TABLE IF EXISTS balance_table;
+CREATE TEMPORARY TABLE balance_table(account_type TINYINT, balance DECIMAL(10, 2));
+-- Loop through each sub-account
+OPEN cur_balance;
+getBalance: LOOP FETCH cur_balance INTO _id,
+_typeid;
+IF finished = 1 THEN LEAVE getBalance;
+END IF;
+-- Call balance and insert it into current row
+CALL `banking_system_project`.`get_balance_by_account_id`(_id, amount);
+INSERT INTO balance_table(account_type, balance)
+VALUES (_typeid, amount);
+END LOOP getBalance;
+CLOSE cur_balance;
+-- Insert the balance of sub account into temp table
+SELECT *
+FROM balance_table;
+DROP TEMPORARY TABLE balance_table;
+END
+$$ DELIMITER ;
+
 /***************************************************************
  * Create transfer
  * If values are not put in then the transfer is a 
@@ -359,45 +408,6 @@ CREATE PROCEDURE IF NOT EXISTS `withdraw`(
   memo,
   result
 );
-END
-$$ DELIMITER ;
-/***************************************************************
- * Create get_account_balance
- ***************************************************************/
-DELIMITER $$
-CREATE PROCEDURE IF NOT EXISTS `get_account_balance`(IN accountNumber INT) BEGIN
-DECLARE amount DECIMAL(10, 2) DEFAULT 0;
-DECLARE finished INTEGER DEFAULT 0;
-DECLARE _id INT;
--- Store account.account_id
-DECLARE _typeid TINYINT;
--- Store account.account_type_id
-DECLARE cur_balance CURSOR FOR
-SELECT a.account_id,
-  a.account_type_id
-FROM `account` AS a
-WHERE a.account_number = accountNumber;
-DECLARE CONTINUE HANDLER FOR NOT FOUND
-SET finished = 1;
--- Create temp table
-DROP TEMPORARY TABLE IF EXISTS balance_table;
-CREATE TEMPORARY TABLE balance_table(account_type TINYINT, balance DECIMAL(10, 2));
--- Loop through each sub-account
-OPEN cur_balance;
-getBalance: LOOP FETCH cur_balance INTO _id,
-_typeid;
-IF finished = 1 THEN LEAVE getBalance;
-END IF;
--- Call balance and insert it into current row
-CALL `banking_system_project`.`get_balance_by_account_id`(_id, amount);
-INSERT INTO balance_table(account_type, balance)
-VALUES (_typeid, amount);
-END LOOP getBalance;
-CLOSE cur_balance;
--- Insert the balance of sub account into temp table
-SELECT *
-FROM balance_table;
-DROP TEMPORARY TABLE balance_table;
 END
 $$ DELIMITER ;
 /***************************************************************
