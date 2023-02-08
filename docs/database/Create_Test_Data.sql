@@ -63,6 +63,7 @@ SELECT * FROM `user`;
 SELECT '******* Deposit 200 *******' as '';
 SET @TransferSuccess = 0;
 CALL `deposit`(@accountNumber1, 1, 200, 'A deposit', @TransferSuccess);
+CALL `get_account_balance`(@accountNumber1);
 
 SELECT '******* Transfer 9.99 *******' as '';
 CALL `transfer`(@accountNumber1, 1, @accountNumber1, 2, 9.99, 'A transfer', @TransferSuccess);
