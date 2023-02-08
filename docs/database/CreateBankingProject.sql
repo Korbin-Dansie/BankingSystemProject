@@ -14,14 +14,14 @@ DROP PROCEDURE IF EXISTS `insert_account_type`; -- Create a new sub type of bank
 DROP PROCEDURE IF EXISTS `insert_user_type`; -- Create a new user type
 
 DROP PROCEDURE IF EXISTS `create_user`; -- Create a user, account number, and two sub accounts
-DROP PROCEDURE IF EXISTS `change_user_type`; -- Create a new user type
+DROP PROCEDURE IF EXISTS `change_user_type`; -- Create a new user type using a string
 DROP PROCEDURE IF EXISTS `create_account`; -- Create a sub account
 DROP PROCEDURE IF EXISTS `create_account_number`; -- Create a account number
 
 DROP PROCEDURE IF EXISTS `getAccountID`; -- Returns account.account_id
 DROP PROCEDURE IF EXISTS `get_balance`; -- Retruns balance from account number and type
 DROP PROCEDURE IF EXISTS `get_balance_by_account_id`; -- Returns balance from account_id
-DROP PROCEDURE IF EXISTS `get_account_balance`; -- Returns table of all the accounts balances
+DROP PROCEDURE IF EXISTS `get_account_balance`; -- Returns table of all the accounts balances (uses a cursor)
 
 DROP PROCEDURE IF EXISTS `transfer`; -- Transfer money from one user to another
 DROP PROCEDURE IF EXISTS `deposit`; -- Deposit money into an account
