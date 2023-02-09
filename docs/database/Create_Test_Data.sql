@@ -8,8 +8,12 @@ CALL `banking_system_project`.`insert_user_type`('customer');
 CALL `banking_system_project`.`insert_user_type`('employee');
 CALL `banking_system_project`.`insert_user_type`('admin');
 
+SELECT * from user_type;
+
 CALL `banking_system_project`.`insert_account_type`('checkings');
 CALL `banking_system_project`.`insert_account_type`('savings');
+
+SELECT * from account_type;
 
 /***************************************************************
 * Insert test user
@@ -42,6 +46,8 @@ CALL `create_user`
  1,
  @accountNumber3);
 
+SELECT * FROM `user`;
+
 /***************************************************************
 * Admin commands
 ***************************************************************/
@@ -50,34 +56,34 @@ CALL `check_credentials`(@accountNumber1, 'MySuperSecurePassword');
 
 CALL `check_credentials`(@accountNumber1, 'NotMypassword');
 
-SELECT '******* Check users *******' as '';
+SELECT '******* Change user types *******' as '';
 CALL `change_user_type`(@accountNumber1, 'admin');
 CALL `change_user_type`(@accountNumber2, 'employee');
 CALL `change_user_type`(@accountNumber3, 'customer');
-
 SELECT * FROM `user`;
 
 /***************************************************************
 * test transfer
 ***************************************************************/
-SELECT '******* Deposit 200 *******' as '';
+SELECT '******* Deposit 200 into checking*******' as '';
 SET @TransferSuccess = 0;
 CALL `deposit`(@accountNumber1, 1, 200, 'A deposit', @TransferSuccess);
 CALL `get_account_balance`(@accountNumber1);
 
-SELECT '******* Transfer 9.99 *******' as '';
+SELECT '******* Transfer 9.99 into savings *******' as '';
 CALL `transfer`(@accountNumber1, 1, @accountNumber1, 2, 9.99, 'A transfer', @TransferSuccess);
 CALL `get_account_balance`(@accountNumber1);
 
-SELECT '******* Withdraw 90.01 *******' as '';
+SELECT '******* Withdraw 90.01 widthraw from checking *******' as '';
 SET @TransferSuccess = 0;
 CALL `withdraw`(@accountNumber1, 1, 90.01, 'A withdraw', @TransferSuccess);
 CALL `get_account_balance`(@accountNumber1);
 
-SELECT '******* Atempt (should fail) to withdraw a million dollars *******' as '';
+SELECT '******* Atempt (should fail) to withdraw to much / or transfer to same account *******' as '';
 SET @TransferSuccess = 0;
 CALL `withdraw`(@accountNumber1, 2, 1000000, 'Im a rich', @TransferSuccess);
 CALL `get_account_balance`(@accountNumber1);
+SELECT @TransferSuccess;
 
 SELECT '******* Transfer money into another person account *******' as '';
 CALL `transfer`(@accountNumber1, 1, @accountNumber2, 2, 1.00, 'Take a dollar', @TransferSuccess);
