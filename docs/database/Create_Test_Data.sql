@@ -23,29 +23,32 @@ SELECT '******* Insert test user *******' as '';
 SET @accountNumber1 = 0;
 SET @accountNumber2 = 0;
 SET @accountNumber3 = 0;
-
+SET @successfulyCreateAccount = 0;
 CALL `create_user`
 ('Korbin',
  'Dansie',
+ 'kd@email.com',
  'MySuperSecurePassword',
  'MySuperSecureSalt',
  1,
- @accountNumber1);
+ @accountNumber1, @successfulyCreateAccount);
   CALL `create_user`
 ('Briella',
  'Rutherford',
+ 'br@email.com',
  'FinalTestPersonPassword',
  'FinalTestSalt',
  1,
- @accountNumber2);
+ @accountNumber2, @successfulyCreateAccount);
  CALL `create_user`
 ('Bradley',
  'Peterson',
+ 'bp@email.com',
  'SomeOtherPassword',
  'SomeOtherSalt',
  1,
- @accountNumber3);
-
+ @accountNumber3, @successfulyCreateAccount);
+SELECT @accountNumber3, @successfulyCreateAccount;
 SELECT * FROM `user`;
 
 /***************************************************************

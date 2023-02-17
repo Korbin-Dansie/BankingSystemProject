@@ -1,6 +1,3 @@
-console.log("Running at: http://localhost:3000/\n");
-
-
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -46,6 +43,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Crypto
+app.use(express.static(path.join(__dirname, "node_modules/crypto-js/")));
 
 // Bootstrap
 app.use(express.static(path.join(__dirname, 'node_modules/bootstrap/dist/')));

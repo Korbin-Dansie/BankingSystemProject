@@ -58,6 +58,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `user_id` int NOT NULL AUTO_INCREMENT,
   `user_first_name` varchar(50) NOT NULL,
   `user_last_name` varchar(50) NOT NULL,
+  `email`			varchar(50) NOT NULL,
   `hashed_password` varchar(255) NOT NULL,
   `salt` varchar(255) NOT NULL,
   `user_role_id` TINYINT NOT NULL,
@@ -156,35 +157,47 @@ $$ DELIMITER ;
  ***************************************************************/
 DELIMITER $$
 CREATE PROCEDURE IF NOT EXISTS `create_user`(
-  IN firstName VARCHAR(50),
-  IN lastName VARCHAR(50),
-  IN hashed_password VARCHAR(255),
-  IN salt VARCHAR(255),
-  IN user_role_id TINYINT,
-  OUT accountNumber int
+  IN firstName			VARCHAR(50),
+  IN lastName			VARCHAR(50),
+  IN email				VARCHAR(50),
+  IN hashed_password 	VARCHAR(255),
+  IN salt				VARCHAR(255),
+  IN user_role_id 		TINYINT,
+  OUT accountNumber 	INT,
+  OUT result			INT
 ) 
 BEGIN -- Create User account
-INSERT INTO `user` (
-    `user_first_name`,
-    `user_last_name`,
-    `hashed_password`,
-    `salt`,
-    `user_role_id`
-  )
-VALUES (
-    firstName,
-    lastName,
-    hashed_password,
-    salt,
-    user_role_id
-  );
--- Generate bankaccount number
-SET @newAccountNumber = 0;
-CALL create_account_number(LAST_INSERT_ID(), @newAccountNumber);
--- Create Two bank accounts
-CALL create_account(@newAccountNumber, 1);
-CALL create_account(@newAccountNumber, 2);
-SELECT @newAccountNumber INTO accountNumber;
+ DECLARE nCount INT DEFAULT 0;
+ SET result = 0;
+ SELECT Count(*) INTO nCount FROM `user` as u WHERE u.email = email;
+ IF nCount > 0 THEN
+	SET result = 1;
+ ELSE 
+ 	SET result = 0;
+	INSERT INTO `user` (
+		`user_first_name`,
+		`user_last_name`,
+		`email`,
+		`hashed_password`,
+		`salt`,
+		`user_role_id`
+	)
+	VALUES (
+		firstName,
+		lastName,
+		email,
+		hashed_password,
+		salt,
+		user_role_id
+	);
+	-- Generate bankaccount number
+	SET @newAccountNumber = 0;
+	CALL create_account_number(LAST_INSERT_ID(), @newAccountNumber);
+	-- Create Two bank accounts
+	CALL create_account(@newAccountNumber, 1);
+	CALL create_account(@newAccountNumber, 2);
+	SELECT @newAccountNumber INTO accountNumber;
+	END IF;
 END
 $$ DELIMITER ;
 /***************************************************************
@@ -363,7 +376,7 @@ BEGIN
 	SELECT a.account_type_id as `account_type`, a.amount as `balance`
     FROM
     `account` as a
-    WHERE a.account_number = accountNumber
+    WHERE a.account_number = accountNumber;
 END
 $$ DELIMITER ;
 /***************************************************************
