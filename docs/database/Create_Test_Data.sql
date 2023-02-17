@@ -105,3 +105,30 @@ SELECT * FROM `account` WHERE  account_number = @accountNumber1;
 DELETE FROM `transaction` WHERE transaction_id = 2;
 
 SELECT * FROM `account` WHERE  account_number = @accountNumber1;
+
+
+CALL `getAccountId`(@accountNumber1, 1, @accountIDForOne);
+
+SELECT 'get_balance' AS '';
+CALL `get_balance`(@accountNumber1, 1, @money);
+SELECT @money;
+
+SELECT 'sum_get_balance' AS '';
+CALL `sum_get_balance`(@accountNumber1, 1, @money);
+SELECT @money;
+
+SELECT 'get_balance_by_account_id' AS '';
+CALL `get_balance_by_account_id`(@accountIDForOne, @money);
+SELECT @money;
+
+SELECT 'sum_get_balance_by_account_id' AS '';
+CALL `sum_get_balance_by_account_id`(@accountIDForOne, @money);
+SELECT @money;
+
+SELECT 'get_account_balance' AS '';
+CALL `get_account_balance`(@accountNumber1);
+
+SELECT 'sum_get_account_balance' AS '';
+CALL `sum_get_account_balance`(@accountNumber1);
+
+
