@@ -19,17 +19,26 @@ router.post("/", function (req, res, next) {
   const userRole = 1;
   let accountNumber;
 
-  const sql = "CALL `banking_system_project`.`create_user`(?, ?, ?, ?, ?, ?, @newAccountNumber, @createSuccess); SELECT @newAccountNumber AS 'accountNumber';";
+  const sql = "CALL `banking_system_project`.`create_user`(?, ?, ?, ?, ?, ?, @newAccountNumber, @createError); SELECT @newAccountNumber, @createError;";
   dbCon.query(
     sql, [firstName, lastName, email, hash, salt, userRole, accountNumber], function (err, rows) {
       if (err) {
         throw err;
       }
-      console.log(rows[1][0]['accountNumber']);
-      console.log("The new account number is: " + "");
-      res.render("register", {
-        message: "You have succesfuly registered the new account number is ######",
-      });
+      if(rows[1][0]['@createError'] == 1){
+        res.render("register", {
+          message: `The email ${email} enter is already in use`,
+        });
+      }
+      else{
+        console.log(rows[1][0]['@newAccountNumber']);
+        console.log("The new account number is: " + "");
+        res.render("register", {
+          message: "You have succesfuly registered the new account number is: " + rows[1][0]['accountNumber'],
+        });
+      }
+
+
     });
 });
 
