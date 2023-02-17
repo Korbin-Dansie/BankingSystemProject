@@ -19,7 +19,7 @@ DROP PROCEDURE IF EXISTS `create_account`; -- Create a sub account
 DROP PROCEDURE IF EXISTS `create_account_number`; -- Create a account number
 
 DROP PROCEDURE IF EXISTS `getAccountID`; -- Returns account.account_id
-DROP PROCEDURE IF EXISTS `get_balance`; -- Retruns balance from account number and type
+DROP PROCEDURE IF EXISTS `get_balance`; -- Returns balance from account number and type
 DROP PROCEDURE IF EXISTS `get_balance_by_account_id`; -- Returns balance from account_id
 DROP PROCEDURE IF EXISTS `get_account_balance`; -- Returns table of all the accounts balances (uses a cursor)
 
@@ -31,6 +31,10 @@ DROP PROCEDURE IF EXISTS `get_account_transaction_history`; -- Returns all the t
 
 DROP PROCEDURE IF EXISTS `check_credentials`; -- check if account number and hashed_password match
 DROP PROCEDURE IF EXISTS `get_salt`; -- Get the salt from the user with the account number
+
+DROP TRIGGER IF EXISTS `trigger_add_new_transaction`; -- Updates account amount on new row added
+DROP TRIGGER IF EXISTS `trigger_update_new_transaction`; -- Updates account amount on new row added
+DROP TRIGGER IF EXISTS `trigger_delete_new_transaction`; -- Updates account amount on new row added
 
 /***************************************************************
  * Create user_type
@@ -79,6 +83,7 @@ CREATE TABLE IF NOT EXISTS `account` (
   `account_id` int NOT NULL AUTO_INCREMENT,
   `account_number` int NOT NULL,
   `account_type_id` tinyint NOT NULL,
+  `amount` decimal(10,2) DEFAULT '0.00',
   PRIMARY KEY (`account_id`),
   KEY `account_number` (`account_number`),
   CONSTRAINT `account_number` FOREIGN KEY (`account_number`) REFERENCES `account_number` (`account_number`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -101,7 +106,7 @@ CREATE TABLE IF NOT EXISTS `transaction` (
 ) COMMENT = 'From	+ NULL = Widthdraw\nTo	+ NULL = Deposit';
 /*******************************************************************************************************************************
  * 
- * CREATE SP
+ * CREATE PROCEDURES
  *
  *******************************************************************************************************************************/
 /***************************************************************
@@ -486,3 +491,85 @@ FROM `user` AS u
 WHERE an.account_number = accountNumber;
 END 
 $$ DELIMITER ;
+
+/*******************************************************************************************************************************
+ * 
+ * CREATE TRIGGERS
+ *
+ *******************************************************************************************************************************/
+DELIMITER $$
+CREATE TRIGGER IF NOT EXISTS `trigger_add_new_transaction` 
+AFTER INSERT
+ON `transaction` FOR EACH ROW
+BEGIN
+	-- Add to the to account
+	UPDATE `account` AS `a`
+    SET 
+    a.amount = CASE WHEN a.amount IS NULL THEN 0 ELSE a.amount END + NEW.transaction_amount
+    WHERE a.account_id = NEW.to_account_id;
+    
+    -- Sub from the from account
+	UPDATE `account` AS `a`
+    SET 
+    a.amount = CASE WHEN a.amount IS NULL THEN 0 ELSE a.amount END - NEW.transaction_amount
+    WHERE a.account_id = NEW.from_account_id;
+END $$ 
+
+CREATE TRIGGER IF NOT EXISTS `trigger_update_new_transaction`
+BEFORE UPDATE
+ON `transaction` FOR EACH ROW
+BEGIN 
+	-- Add the orignal amount back to the original from_account
+	UPDATE `account` AS `a`
+    SET 
+    a.amount = 
+    CASE WHEN a.amount IS NULL THEN 0 ELSE a.amount END 
+    + OLD.transaction_amount
+    WHERE a.account_id = OLD.from_account_id;
+    
+    -- Subtract the orignal amount from the original to_account
+	UPDATE `account` AS `a`
+    SET 
+    a.amount = 
+    CASE WHEN a.amount IS NULL THEN 0 ELSE a.amount END
+    - OLD.transaction_amount
+    WHERE a.account_id = OLD.to_account_id;
+    
+    -- Subtract the new amount from the new from_account
+	UPDATE `account` AS `a`
+    SET 
+    a.amount = 
+    CASE WHEN a.amount IS NULL THEN 0 ELSE a.amount END 
+    - NEW.transaction_amount
+    WHERE a.account_id = NEW.from_account_id;
+    
+	-- Add the new amount from the new to_account
+	UPDATE `account` AS `a`
+    SET 
+    a.amount = 
+    CASE WHEN a.amount IS NULL THEN 0 ELSE a.amount END
+    + NEW.transaction_amount
+    WHERE a.account_id = NEW.to_account_id;
+    
+END $$
+
+CREATE TRIGGER IF NOT EXISTS `trigger_delete_new_transaction`
+BEFORE DELETE
+ON `transaction` FOR EACH ROW
+BEGIN 
+	-- Add the orignal amount back to the original from_account
+	UPDATE `account` AS `a`
+    SET 
+    a.amount = 
+    CASE WHEN a.amount IS NULL THEN 0 ELSE a.amount END 
+    + OLD.transaction_amount
+    WHERE a.account_id = OLD.from_account_id;
+    
+    -- Subtract the orignal amount from the original to_account
+	UPDATE `account` AS `a`
+    SET 
+    a.amount = 
+    CASE WHEN a.amount IS NULL THEN 0 ELSE a.amount END
+    - OLD.transaction_amount
+    WHERE a.account_id = OLD.to_account_id;
+END $$
