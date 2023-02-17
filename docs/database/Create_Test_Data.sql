@@ -96,8 +96,12 @@ SELECT '******* Show transaction history *******' as '';
 CALL `get_account_transaction_history`(@accountNumber1);
 CALL `get_transaction_history`(@accountNumber2, 2);
 
-SELECT * from `account` WHERE  account_number = @accountNumber1;
+SELECT * FROM `account` WHERE  account_number = @accountNumber1;
 
 UPDATE `transaction` SET transaction_amount = 2.99 WHERE transaction_id = 2;
 
-SELECT * from `account` WHERE  account_number = @accountNumber1;
+SELECT * FROM `account` WHERE  account_number = @accountNumber1;
+
+DELETE FROM `transaction` WHERE transaction_id = 2;
+
+SELECT * FROM `account` WHERE  account_number = @accountNumber1;

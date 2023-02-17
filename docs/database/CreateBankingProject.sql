@@ -505,13 +505,13 @@ BEGIN
 	-- Add to the to account
 	UPDATE `account` AS `a`
     SET 
-    a.amount = CASE WHEN a.amount IS NULL THEN 0 ELSE a.amount END + NEW.transaction_amount
+    a.amount = a.amount + NEW.transaction_amount
     WHERE a.account_id = NEW.to_account_id;
     
     -- Sub from the from account
 	UPDATE `account` AS `a`
     SET 
-    a.amount = CASE WHEN a.amount IS NULL THEN 0 ELSE a.amount END - NEW.transaction_amount
+    a.amount = a.amount - NEW.transaction_amount
     WHERE a.account_id = NEW.from_account_id;
 END $$ 
 
@@ -522,33 +522,25 @@ BEGIN
 	-- Add the orignal amount back to the original from_account
 	UPDATE `account` AS `a`
     SET 
-    a.amount = 
-    CASE WHEN a.amount IS NULL THEN 0 ELSE a.amount END 
-    + OLD.transaction_amount
+    a.amount = a.amount + OLD.transaction_amount
     WHERE a.account_id = OLD.from_account_id;
     
     -- Subtract the orignal amount from the original to_account
 	UPDATE `account` AS `a`
     SET 
-    a.amount = 
-    CASE WHEN a.amount IS NULL THEN 0 ELSE a.amount END
-    - OLD.transaction_amount
+    a.amount = a.amount - OLD.transaction_amount
     WHERE a.account_id = OLD.to_account_id;
     
     -- Subtract the new amount from the new from_account
 	UPDATE `account` AS `a`
     SET 
-    a.amount = 
-    CASE WHEN a.amount IS NULL THEN 0 ELSE a.amount END 
-    - NEW.transaction_amount
+    a.amount = a.amount - NEW.transaction_amount
     WHERE a.account_id = NEW.from_account_id;
     
 	-- Add the new amount from the new to_account
 	UPDATE `account` AS `a`
     SET 
-    a.amount = 
-    CASE WHEN a.amount IS NULL THEN 0 ELSE a.amount END
-    + NEW.transaction_amount
+    a.amount = a.amount + NEW.transaction_amount
     WHERE a.account_id = NEW.to_account_id;
     
 END $$
@@ -560,16 +552,12 @@ BEGIN
 	-- Add the orignal amount back to the original from_account
 	UPDATE `account` AS `a`
     SET 
-    a.amount = 
-    CASE WHEN a.amount IS NULL THEN 0 ELSE a.amount END 
-    + OLD.transaction_amount
+    a.amount = a.amount + OLD.transaction_amount
     WHERE a.account_id = OLD.from_account_id;
     
     -- Subtract the orignal amount from the original to_account
 	UPDATE `account` AS `a`
     SET 
-    a.amount = 
-    CASE WHEN a.amount IS NULL THEN 0 ELSE a.amount END
-    - OLD.transaction_amount
+    a.amount = a.amount - OLD.transaction_amount
     WHERE a.account_id = OLD.to_account_id;
 END $$
