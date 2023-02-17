@@ -19,14 +19,10 @@ DROP PROCEDURE IF EXISTS `create_account`; -- Create a sub account
 DROP PROCEDURE IF EXISTS `create_account_number`; -- Create a account number
 
 DROP PROCEDURE IF EXISTS `getAccountID`; -- Returns account.account_id
-DROP PROCEDURE IF EXISTS `sum_get_balance`; -- Returns balance from account number and type by summing from transactions history
-DROP PROCEDURE IF EXISTS `sum_get_balance_by_account_id`; -- Returns balance from account_id by summing from transactions history
-DROP PROCEDURE IF EXISTS `sum_get_account_balance`; -- Returns table of all the accounts balances (uses a cursor) by summing from transactions history
 
 DROP PROCEDURE IF EXISTS `get_balance`; -- Returns balance from account number and type
 DROP PROCEDURE IF EXISTS `get_balance_by_account_id`; -- Returns balance from account_id
 DROP PROCEDURE IF EXISTS `get_account_balance`; -- Returns table of all the accounts balances (uses a cursor)
-
 
 DROP PROCEDURE IF EXISTS `transfer`; -- Transfer money from one user to another
 DROP PROCEDURE IF EXISTS `deposit`; -- Deposit money into an account
@@ -37,11 +33,15 @@ DROP PROCEDURE IF EXISTS `get_account_transaction_history`; -- Returns all the t
 DROP PROCEDURE IF EXISTS `check_credentials`; -- check if account number and hashed_password match
 DROP PROCEDURE IF EXISTS `get_salt`; -- Get the salt from the user with the account number
 
-
-
 DROP TRIGGER IF EXISTS `trigger_add_new_transaction`; -- Updates account amount on new row added
 DROP TRIGGER IF EXISTS `trigger_update_new_transaction`; -- Updates account amount on new row added
 DROP TRIGGER IF EXISTS `trigger_delete_new_transaction`; -- Updates account amount on new row added
+
+-- Currently un-used
+DROP PROCEDURE IF EXISTS `sum_get_balance`; -- Returns balance from account number and type by summing from transactions history
+DROP PROCEDURE IF EXISTS `sum_get_balance_by_account_id`; -- Returns balance from account_id by summing from transactions history
+DROP PROCEDURE IF EXISTS `sum_get_account_balance`; -- Returns table of all the accounts balances (uses a cursor) by summing from transactions history
+
 
 /***************************************************************
  * Create user_type
@@ -347,12 +347,11 @@ DELIMITER $$
 CREATE PROCEDURE IF NOT EXISTS `get_balance_by_account_id`(
   IN accountID INT,
   OUT balance DECIMAL(10, 2)
-) BEGIN
-
-SELECT a.amount FROM `account` as a
-WHERE a.account_id = accountID
-INTO balance;
-
+) 
+BEGIN
+	SELECT a.amount FROM `account` as a
+	WHERE a.account_id = accountID
+	INTO balance;
 END
 $$ DELIMITER ;
 /***************************************************************
@@ -564,12 +563,15 @@ BEGIN
     SET 
     a.amount = a.amount - NEW.transaction_amount
     WHERE a.account_id = NEW.from_account_id;
-END $$ 
+END 
+$$ 
 
 CREATE TRIGGER IF NOT EXISTS `trigger_update_new_transaction`
 BEFORE UPDATE
 ON `transaction` FOR EACH ROW
 BEGIN 
+	-- Might add this to only trigger on change of to/from account, OR amount 
+    -- https://stackoverflow.com/questions/4097949/mysql-trigger-question-only-trigger-when-a-column-is-changed
 	-- Add the orignal amount back to the original from_account
 	UPDATE `account` AS `a`
     SET 
@@ -593,8 +595,8 @@ BEGIN
     SET 
     a.amount = a.amount + NEW.transaction_amount
     WHERE a.account_id = NEW.to_account_id;
-    
-END $$
+END 
+$$
 
 CREATE TRIGGER IF NOT EXISTS `trigger_delete_new_transaction`
 BEFORE DELETE
@@ -611,4 +613,5 @@ BEGIN
     SET 
     a.amount = a.amount - OLD.transaction_amount
     WHERE a.account_id = OLD.to_account_id;
-END $$
+END 
+$$
