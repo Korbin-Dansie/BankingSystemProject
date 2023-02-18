@@ -1,20 +1,27 @@
 <!-- https://getbootstrap.com/docs/4.0/components/navbar/ -->
 <nav
-  class="navbar navbar-expand-lg navbar-light bg-light" style="background-color: #36678a">
-  <a class="navbar-brand" href="#">Home</a>
+  class="navbar navbar-expand-lg navbar-light bg-light"
+>
+<div class="m-0 p-0">
+    <a class="navbar-brand ms-5 d-flex align-items-center" href="/">
+    <img src="/images/favicon.png" alt="Logo" width="24" height="24" class="d-inline-block align-text-top"/>
+        Home
+    </a>
+</div>
   <button
-    class="navbar-toggler"
+    class="navbar-toggler me-5"
     type="button"
     data-toggle="collapse"
     data-target="#navbarTogglerDemo03"
     aria-controls="navbarTogglerDemo03"
     aria-expanded="false"
-    aria-label="Toggle navigation">
+    aria-label="Toggle navigation"
+  >
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
-    <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-      <li class="nav-item active">
+    <ul class="navbar-nav mr-auto mt-2 mt-lg-0 ms-5">
+      <li class="nav-item">
         <a class="nav-link" href="/transfer">Transfer</a>
       </li>
       <li class="nav-item">
@@ -23,7 +30,7 @@
       <li class="nav-item">
         <a class="nav-link" href="/transact">Deposit / Withdraw</a>
       </li>
-      <!-- <li class="nav-item">
+      <li class="nav-item">
         <a class="nav-link" href="/register">Register</a>
       </li>
       <li class="nav-item">
@@ -31,12 +38,11 @@
       </li>
       <li class="nav-item">
         <a class="nav-link" href="/managePermissions">Manage Permisions</a>
-      </li> -->
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/logout">Log out</a>
+      </li>
     </ul>
-    <!-- <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-        <li class="nav-item">
-            <a class="nav-link" href="/logout">Log out</a>
-          </li>
-    </ul> -->
   </div>
+
 </nav>
