@@ -3,10 +3,13 @@
   <head>
     <title>title</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="font/bootstrap-icons.css" />
     <%- include('partials/favico') %>
 
   </head>
   <body>
+    <%- include('partials/navbar') %>
     <h1>Landing</h1>
     <p>Welcome to landing page. This is what is viewed after a cutomer logins in.</p>
     <p>It will have two buttons which they can click to go to there transaction history of <a href="/transactionHistory">savings</a> or <a href="/transactionHistory">checking</a></p>

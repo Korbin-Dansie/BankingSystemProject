@@ -13,6 +13,11 @@
 
   <script>
     function checkUser(event) {
+      const accountNumber = document.getElementById("accountNumber").value;
+      if(accountNumber == ""){
+        document.getElementById("message").innerText = "Please enter a account number";
+        event.preventDefault();
+      }
     }
   </script>
 
