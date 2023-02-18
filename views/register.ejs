@@ -56,7 +56,7 @@
               <h3 class="text-primary">Bank</h3>
               <h3 class="text-primary">Register New Account</h3>
             </div>
-            <form onSubmit="return checkPassword(event);" method="post">
+            <form onSubmit="return checkPassword(event);" method="post" autocomplete="off">
               <div class="p-4">
                 <div class="input-group mb-3">
                   <span class="input-group-text bg-primary">
@@ -136,6 +136,9 @@
                   <p id="message" class="text-main" style="height: 25px">
                     <%- locals.message %>
                   </p>
+                  <h5>
+                    <%- locals.accountNumber %>
+                  </h5>
                 </div>
               </div>
             </form>

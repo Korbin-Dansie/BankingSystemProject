@@ -31,10 +31,11 @@ router.post("/", function (req, res, next) {
         });
       }
       else{
-        console.log(rows[1][0]['@newAccountNumber']);
-        console.log("The new account number is: " + "");
-        res.render("register", {
-          message: "You have succesfuly registered the new account number is: " + rows[1][0]['accountNumber'],
+        console.log("The new account number is: " + rows[1][0]['@newAccountNumber']);    
+
+        res.render("registerSuccess", {
+          message: "The new account number is: ",
+          accountNumber: rows[1][0]['@newAccountNumber']
         });
       }
 
