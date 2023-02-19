@@ -33,11 +33,11 @@
               <div class="row">
                 <% if (locals.checkingAccount) { %>
                 <div
-                  class="col-5 d-flex align-items-stretch p-0 ps-2" style="background: #0d6efd;"
+                  class="col-md-5 col-xs-12 mb-xs-5 p-0 d-flex align-items-stretch" style="background: #0d6efd;"
                 >
-                <a href="/transactionHistory" class="box-shadow">
+                <a href="/transactionHistory" class="box-shadow d-flex align-items-stretch w-100">
                   <!-- Account info DIV -->
-                  <div class="bg-white p-1 row ms-1">
+                  <div class="bg-white p-1 row ms-3 w-100">
                     <div>
                       <h5 class="text-start">Checking Account</h5>
                     </div>
@@ -54,16 +54,15 @@
                   <!-- End of Account info DIV -->
                 </a>
                 </div>
-                <% } %> 
-                <div class="col-1"></div>
-                
+                <% } %>     
+                <div class="col-md-1 col-xs-0"></div>            
                 <% if (locals.savingAccount) { %>
                   <div
-                  class="col-5 d-flex align-items-stretch p-0 ps-2" style="background: #198754;"
+                  class="col-md-5 col-xs-12 p-0 d-flex align-items-stretch" style="background: #198754;"
                 >
-                <a href="/transactionHistory" class="box-shadow">
+                <a href="/transactionHistory" class="box-shadow d-flex align-items-stretch w-100">
                   <!-- Account info DIV -->
-                  <div class="bg-white p-1 row ms-1">
+                  <div class="bg-white p-1 row ms-3 w-100">
                     <div>
                       <h5 class="text-start">Saving Account</h5>
                     </div>
