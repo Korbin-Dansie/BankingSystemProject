@@ -5,3 +5,13 @@ body {
 a {
   color: #00B7FF;
 }
+
+a.box-shadow {
+  all: unset;
+}
+
+.box-shadow:hover > * {
+  text-shadow: none;
+  color: initial;
+	box-shadow: 0 10px 20px rgba(72,78,85,.6);
+}

@@ -2,54 +2,90 @@
 <html>
   <head>
     <title>Landing Page</title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel="stylesheet" href="/stylesheets/style.css" />
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="font/bootstrap-icons.css" />
     <%- include('partials/favico') %>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-
-
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"
+    ></script>
   </head>
   <body>
     <%- include('partials/navbar') %>
-    <div class="container-fluid vh-100" style="margin-top:10px">
-      <div class="" style="margin-top:100px">
+    <div class="container-fluid vh-100" style="margin-top: 10px">
+      <div class="" style="margin-top: 100px">
         <div class="rounded d-flex justify-content-center">
-          <div class="col-md-4 col-sm-12 shadow-lg p-5 bg-light">
+          <div class="col-lg-6 col-md-8 col-sm-12 shadow-lg p-5 bg-light">
             <div class="text-center">
-              <h3 class="text-primary">Landing Page</h3>
-            </div>
-            <form onSubmit="return checkUser(event);" method="post">
-              <div class="p-4">
-                <div class="input-group mb-3">
-                  <span class="input-group-text bg-primary">
-                    <i class="bi bi-person-plus-fill text-white"></i>
-                  </span>
-                  <input id="accountNumber" name="accountNumber" type="text" class="form-control" autofocus="autofocus" placeholder="Account Number">
+              <h3 class="text-primary mb-3">Landing Page</h3>
+              <div class="row">
+                <% if (locals.checkingAccount) { %>
+                <div
+                  class="col-5 d-flex align-items-stretch p-0 ps-2" style="background: #0d6efd;"
+                >
+                <a href="/transactionHistory" class="box-shadow">
+                  <!-- Account info DIV -->
+                  <div class="bg-white p-1 row ms-1">
+                    <div>
+                      <h5 class="text-start">Checking Account</h5>
+                    </div>
+                    <!-- Force next columns to break to new line -->
+                    <!-- Account balance -->
+                      <div class="col-md-6 col-xs-12">
+                        <p class="text-start">Available Balance</p>
+                      </div>
+                      <div class="col-md-6 col-xs-12">
+                        <p class="text-end fw-bold"><%- locals.checkingAccount %></p>
+                      </div>
+                    <!-- End of Account balance -->
+                  </div>
+                  <!-- End of Account info DIV -->
+                </a>
                 </div>
-                <div>
-                  <p id="message" class="text-danger">
-                    <%- locals.message %>
-                  </p>
+                <% } %> 
+                <div class="col-1"></div>
+                
+                <% if (locals.savingAccount) { %>
+                  <div
+                  class="col-5 d-flex align-items-stretch p-0 ps-2" style="background: #198754;"
+                >
+                <a href="/transactionHistory" class="box-shadow">
+                  <!-- Account info DIV -->
+                  <div class="bg-white p-1 row ms-1">
+                    <div>
+                      <h5 class="text-start">Saving Account</h5>
+                    </div>
+                    <!-- Force next columns to break to new line -->
+                    <!-- Account balance -->
+                      <div class="col-md-6 col-xs-12">
+                        <p class="text-start">Available Balance</p>
+                      </div>
+                      <div class="col-md-6 col-xs-12">
+                        <p class="text-end fw-bold"><%- locals.savingAccount %></p>
+                      </div>
+                    <!-- End of Account balance -->
+                  </div>
+                  <!-- End of Account info DIV -->
+                </a>
                 </div>
-                <div class="text-center">
-                  <button class="btn btn-primary mt-2" type="submit">
-                    Next
-                  </button>
-                </div>
-                <!-- <p class="text-center mt-5">Don't have an account?
-                  <span class="text-primary"><a href="/register">Sign Up</a></span>
-                </p> -->
-                <!-- <p class="text-center text-primary">Forgot your password?</p> -->
+                <% } %>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  
-
   </body>
 </html>
