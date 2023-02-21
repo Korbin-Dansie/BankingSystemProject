@@ -499,7 +499,8 @@ FROM account_number AS an
     OR (t.to_account_id = a.account_id)
   )
 WHERE an.account_number = accountNumber
-  AND a.account_type_id = accountType;
+  AND a.account_type_id = accountType
+ORDER BY t.transaction_id DESC;
 END
 $$ DELIMITER ;
 /***************************************************************
@@ -523,7 +524,9 @@ FROM account_number AS an
     (t.from_account_id = a.account_id)
     OR (t.to_account_id = a.account_id)
   )
-WHERE an.account_number = accountNumber;
+WHERE an.account_number = accountNumber  
+ORDER BY t.transaction_id DESC;
+
 END
 $$ DELIMITER ;
 /***************************************************************
