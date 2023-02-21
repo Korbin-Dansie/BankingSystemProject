@@ -45,11 +45,11 @@
         <tbody>
           <% if (typeof transactionHistory != 'undefined') { %>
           <% transactionHistory.forEach(entry => {%>
-            <%if (entry.bankAccountNumberToSufix == 1) { %>
+            <%if (entry.account_type_id == 1) { %>
             <tr>
-              <td><%= entry.amount %></td>
+              <td><%= entry.transaction_amount %></td>
               <td><%= entry.memo %></td>
-              <td><%= entry.transactionDate %></td>
+              <td><%= entry.transaction_time %></td>
             </tr>
             <% } %>
           <% }) %>
@@ -72,12 +72,12 @@
         <tbody>
           <% if (typeof transactionHistory != 'undefined') { %>
             <% transactionHistory.forEach(entry => {%>
-              <%if (entry.bankAccountNumberToSufix == 2) { %>
+              <%if (entry.account_type_id == 2) { %>
               <tr>
-                <td><%= entry.amount %></td>
+                <td><%= entry.transaction_amount %></td>
                 <td><%= entry.memo %></td>
-                <td><%= entry.transactionDate %></td>
-              </tr>
+                <td><%= entry.transaction_time %></td>
+                </tr>
               <% } %>
             <% }) %>
             <% } %>          </tbody>

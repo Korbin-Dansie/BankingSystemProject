@@ -7,7 +7,7 @@ router.get('/', function(req, res, next) {
   console.log('Landing Page: GET');
 
   if (!req.session.loggedIn || req.session.loggedIn == false){
-    res.redirect('/login');
+    res.redirect('/');
   }
   else{
     let sql = "CALL get_account_balance(?);";
