@@ -33,51 +33,69 @@
               <div class="row">
                 <% if (locals.checkingAccount) { %>
                 <div
-                  class="col-md-5 col-xs-12 mb-xs-5 p-0 d-flex align-items-stretch" style="background: #0d6efd;"
+                  class="col-md-5 col-xs-12 mb-xs-5 p-0 d-flex align-items-stretch"
+                  style="background: #0d6efd"
                 >
-                <a href="/transactionHistory" class="box-shadow d-flex align-items-stretch w-100">
-                  <!-- Account info DIV -->
-                  <div class="bg-white p-1 row ms-3 w-100">
-                    <div>
-                      <h5 class="text-start">Checking Account</h5>
+                  <a
+                    href="/transactionHistory"
+                    class="box-shadow d-flex align-items-stretch w-100"
+                  >
+                    <!-- Account info DIV -->
+                    <div class="bg-white p-1 row ms-3 w-100">
+                      <div>
+                        <h5 class="text-start">Checking Account</h5>
+                      </div>
+                      <!-- Force next columns to break to new line -->
+                      <div class="w-100"></div>
+                      <div class="d-flex">
+                        <!-- Account balance -->
+                        <div class="flex-shrink-1">
+                          <p class="text-start me-2">Available Balance</p>
+                        </div>
+                        <div class="flex-fill">
+                          <p class="text-end fw-bold">
+                            <%- locals.checkingAccount %>
+                          </p>
+                        </div>
+                        <!-- End of Account balance -->
+                      </div>
                     </div>
-                    <!-- Force next columns to break to new line -->
-                    <!-- Account balance -->
-                      <div class="col-md-6 col-xs-12">
-                        <p class="text-start">Available Balance</p>
-                      </div>
-                      <div class="col-md-6 col-xs-12">
-                        <p class="text-end fw-bold"><%- locals.checkingAccount %></p>
-                      </div>
-                    <!-- End of Account balance -->
-                  </div>
-                  <!-- End of Account info DIV -->
-                </a>
+                    <!-- End of Account info DIV -->
+                  </a>
                 </div>
-                <% } %>     
-                <div class="col-md-1 col-xs-0"></div>            
+                <% } %>
+                <div class="col-md-1 col-xs-0"></div>
                 <% if (locals.savingAccount) { %>
-                  <div
-                  class="col-md-5 col-xs-12 p-0 d-flex align-items-stretch" style="background: #198754;"
+                <div
+                  class="col-md-5 col-xs-12 p-0 d-flex align-items-stretch"
+                  style="background: #198754"
                 >
-                <a href="/transactionHistory" class="box-shadow d-flex align-items-stretch w-100">
-                  <!-- Account info DIV -->
-                  <div class="bg-white p-1 row ms-3 w-100">
-                    <div>
-                      <h5 class="text-start">Saving Account</h5>
+                  <a
+                    href="/transactionHistory"
+                    class="box-shadow d-flex align-items-stretch w-100"
+                  >
+                    <!-- Account info DIV -->
+                    <div class="bg-white p-1 row ms-3 w-100">
+                      <div>
+                        <h5 class="text-start">Saving Account</h5>
+                      </div>
+                      <!-- Force next columns to break to new line -->
+                      <div class="w-100"></div>
+                      <div class="d-flex">
+                        <!-- Account balance -->
+                        <div class="flex-shrink-1">
+                          <p class="text-start me-2">Available Balance</p>
+                        </div>
+                        <div class="flex-fill">
+                          <p class="text-end fw-bold">
+                            <%- locals.savingAccount %>
+                          </p>
+                        </div>
+                        <!-- End of Account balance -->
+                      </div>
                     </div>
-                    <!-- Force next columns to break to new line -->
-                    <!-- Account balance -->
-                      <div class="col-md-6 col-xs-12">
-                        <p class="text-start">Available Balance</p>
-                      </div>
-                      <div class="col-md-6 col-xs-12">
-                        <p class="text-end fw-bold"><%- locals.savingAccount %></p>
-                      </div>
-                    <!-- End of Account balance -->
-                  </div>
-                  <!-- End of Account info DIV -->
-                </a>
+                    <!-- End of Account info DIV -->
+                  </a>
                 </div>
                 <% } %>
               </div>
