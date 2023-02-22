@@ -1,73 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bootstrap 5 Login Form Example</title>
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="font/bootstrap-icons.css" />
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+      crossorigin="anonymous"
+    ></script>
 
     <%- include('partials/favico') %>
 
     <script>
-        function checkPassword(event) {}
+
+      function checkTransaction(event) {
+        const messageElement = document.getElementById('message');
+        messageElement.innerText = "";
+        const checkingAccountBalance = document.getElementById(
+        "checkingAccountNumber"
+      ).value;
+      const savingAccountBalance = document.getElementById(
+        "savingAccountNumber"
+      ).value;
+
+      const transactionType = document.getElementById("administration").value;
+      const accountType = document.getElementById("accountType").value;
+      const amount = document.getElementById("amount").value;
+
+        if (isNaN(amount)) {
+          messageElement.innerText = "Amount is not a number";
+          event.preventDefault();
+        }
+        // incorect number of decimal places
+        else if (amount > Math.floor(amount)) {
+          // If there are to many decimal places
+          const decimalPlaces = amount.split(".")[1].length;
+          if (decimalPlaces > 2) {
+            messageElement.innerText = "To many decimal places in amount";
+            event.preventDefault();
+          }
+        }
+        
+        // IF amount is greater than account balance on a withdraw 
+        if (transactionType == "withdraw") {
+          if (accountType == 1 && (Number(amount) > Number(checkingAccountBalance))) {
+            messageElement.innerText = "Not enogh funds in checking acount";
+            event.preventDefault();
+          }
+          if (accountType == 2 && (Number(amount) > Number(savingAccountBalance))) {
+            messageElement.innerText = "Not enogh funds in saving acount";
+            event.preventDefault();
+          }
+        }
+      }
     </script>
+  </head>
 
-</head>
-
-<body>
+  <body>
     <%- include('partials/navbar') %>
 
-    <div class="container-fluid vh-100" style="margin-top:10px">
-        <div class="" style="margin-top:100px">
-            <div class="rounded d-flex justify-content-center">
-                <div class="col-md-4 col-sm-12 shadow-lg p-5 bg-light">
-                    <div class="text-center">
-                        <h3 class="text-primary">Transaction</h3>
-                    </div>
-                    <!-- display Account info -->
-                    <div>
-                        <p>Name: <%= locals.firstName %> <%= locals.lastName %></p>
-                        <p>Checking Account: <%= locals.checkingAccount %></p>
-                        <p>Saving Account: <%= locals.savingAccount %></p>
-                    </div>
-                    <!-- end of display Account info -->
-                    <form action="/landingPage" onSubmit="return checkPassword(event);" method="post">
-                        <div class="p-4">
-                            <div class="input-group mb-3">
-                                <span class="input-group-text bg-primary">
-                                    <i class="bi bi-wallet text-white"></i>
-                                </span>
-                                <!-- Transfer type -->
-                                <select id="administration" name="administration" class="form-select" required>
-                                    <option hidden disabled selected value> -- Transaction Type -- </option>
-                                    <option value="deposit">Deposit</option>
-                                    <option value="widthdraw">Widthdraw</option>
-                                </select>
-                            </div>
-                            <!-- Select Amount -->
-                            <div class="input-group mb-3">
-                                <span class="input-group-text bg-primary">
-                                    <i class="bi bi-currency-dollar text-white"></i>
-                                </span>
-                                <input id="amount" name="amount" type="number" min="1" step="any" class="form-control"
-                                    placeholder="Amount">
-                            </div>
-                        </div>
-                        <div class="text-center">
-                            <button class="btn btn-primary text-center mt-2" type="submit">
-                                Submit
-                            </button>
-                        </div>
-                </div>
-                </form>
+    <div class="container-fluid vh-100" style="margin-top: 10px">
+      <div class="" style="margin-top: 100px">
+        <div class="rounded d-flex justify-content-center">
+          <div class="col-md-4 col-sm-12 shadow-lg p-5 bg-light">
+            <div class="text-center">
+              <h3 class="text-primary">Transaction</h3>
             </div>
-        </div>
-    </div>
-    </div>
-</body>
+            <!-- display Account info -->
+            <div>
+              <p>Name: <%= locals.firstName %> <%= locals.lastName %></p>
+              <p>Checking Account: <%= locals.checkingAccount %></p>
+              <p>Saving Account: <%= locals.savingAccount %></p>
+            </div>
+            <!-- end of display Account info -->
+            <form
+              action="/transact"
+              onSubmit="return checkTransaction(event);"
+              method="post"
+            >
+              <div class="p-4">
+                <div class="input-group mb-3">
+                  <span class="input-group-text bg-primary">
+                    <i class="bi bi-wallet text-white"></i>
+                  </span>
+                  <!-- Transfer type -->
+                  <select
+                    id="administration"
+                    name="administration"
+                    class="form-select"
+                    required
+                  >
+                    <option hidden disabled selected value>
+                      -- Transaction Type --
+                    </option>
+                    <option value="deposit">Deposit</option>
+                    <option value="withdraw">Widthdraw</option>
+                  </select>
+                </div>
+                <!-- To account type -->
+                <div class="input-group mb-3">
+                  <span class="input-group-text bg-primary">
+                    <i class="bi bi-bank text-white"></i>
+                  </span>
+                  <select
+                    id="accountType"
+                    name="accountType"
+                    class="form-select"
+                    required
+                  >
+                    <option selected value>-- Account --</option>
+                    <option value="1">Checking</option>
+                    <option value="2">Savings</option>
+                  </select>
+                </div>
+                <!-- Select Amount -->
+                <div class="input-group mb-3">
+                  <span class="input-group-text bg-primary">
+                    <i class="bi bi-currency-dollar text-white"></i>
+                  </span>
+                  <input
+                    id="amount"
+                    name="amount"
+                    type="number"
+                    min="1"
+                    step="any"
+                    class="form-control"
+                    placeholder="Amount"
+                  />
+                </div>
+                <div class="text-center">
+                  <button
+                    class="btn btn-primary text-center mt-2"
+                    type="submit"
+                  >
+                    Submit
+                  </button>
+                </div>
+                <!-- Hidden info -->
+                <input
+                  type="hidden"
+                  name="accountNumber"
+                  value=<%=locals.accountNumber%>
+                >
+                <div>
+                  <p id="message" class="text-danger"></p>
+                </div>
+              </div>
+             <!-- acount balance information -->
+            <input type="hidden" id="checkingAccountNumber" value=<%=locals.checkingAccountNumber %>>
+            <input type="hidden" id="savingAccountNumber" value=<%=locals.savingAccountNumber %>>
 
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
