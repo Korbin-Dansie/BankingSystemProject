@@ -25,6 +25,7 @@ DROP PROCEDURE IF EXISTS `get_balance_by_account_id`; -- Returns balance from ac
 DROP PROCEDURE IF EXISTS `get_account_balance`; -- Returns table of all the accounts balances (uses a cursor)
 
 DROP PROCEDURE IF EXISTS `transfer`; -- Transfer money from one user to another
+DROP PROCEDURE IF EXISTS `user_transfer`; -- Used by customers to transfer money between themselves
 DROP PROCEDURE IF EXISTS `deposit`; -- Deposit money into an account
 DROP PROCEDURE IF EXISTS `withdraw`; -- Withdraw money from an account
 DROP PROCEDURE IF EXISTS `get_transaction_history`; -- Return a table of all the transaction a sub account has done
@@ -394,7 +395,8 @@ CREATE PROCEDURE IF NOT EXISTS `transfer`(
   IN amount DECIMAL(10, 2),
   IN memo VARCHAR(255),
   OUT result TINYINT
-) BEGIN
+) 
+BEGIN
 DECLARE fromAccountId INT;
 DECLARE toAccountId INT;
 DECLARE balance DECIMAL(10, 2);
@@ -414,6 +416,7 @@ IF (
     AND (fromAccountId IS NOT NULL)
   )
   OR fromAccountId = toAccountId
+  OR (amount <= 0)
 ) THEN
 SELECT 0 INTO result;
 ELSE -- Transfer the money
@@ -434,6 +437,55 @@ END IF;
 END
 $$ DELIMITER ;
 /***************************************************************
+ * CREATE user_transfer
+ * A more restrictive transfer used by customers
+ * It makes sure that users cannt transfer to an account that 
+ * does not exist, and cannot transfer $0
+ ***************************************************************/
+ DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS `user_transfer`(
+  IN fromAccountNumber INT,
+  IN fromAccountType TINYINT,
+  IN toAccountNumber INT,
+  IN toAccountType TINYINT,
+  IN amount DECIMAL(10, 2),
+  IN memo VARCHAR(255),
+  OUT result TINYINT)
+BEGIN
+	DECLARE fromAccountId INT DEFAULT 0;
+    DECLARE toAccountId	INT DEFAULT 0;
+    
+	-- Make sure fromAccount exists
+    CALL `banking_system_project`.`getAccountID`(
+    fromAccountNumber,
+    fromAccountType,
+    fromAccountId
+    );
+
+    -- Make sure toAccount exists
+	CALL `banking_system_project`.`getAccountID`(
+    toAccountNumber,
+    toAccountType,
+    toAccountId
+    );
+    
+    IF(fromAccountId IS NULL OR toAccountId IS NULL) THEN
+    SET result = 0;
+    ELSE 
+    CALL `banking_system_project`.`transfer`(
+    fromAccountNumber,
+    fromAccountType,
+    toAccountNumber,
+    toAccountType,
+	amount,
+    memo,
+    result
+    );
+    END IF;
+END
+$$ DELIMITER ;
+
+/***************************************************************
  * Create deposit
  ***************************************************************/
 DELIMITER $$
@@ -443,14 +495,16 @@ CREATE PROCEDURE IF NOT EXISTS `deposit`(
   IN amount DECIMAL(10, 2),
   IN memo VARCHAR(255),
   OUT result TINYINT
-) BEGIN CALL `banking_system_project`.`transfer`(
-  NULL,
-  NULL,
-  toAccountNumber,
-  toAccountType,
-  amount,
-  memo,
-  result
+) 
+  BEGIN 
+	CALL `banking_system_project`.`transfer`(
+	NULL,
+	NULL,
+	toAccountNumber,
+	toAccountType,
+	amount,
+	memo,
+	result
 );
 END
 $$ DELIMITER ;
@@ -464,7 +518,9 @@ CREATE PROCEDURE IF NOT EXISTS `withdraw`(
   IN amount DECIMAL(10, 2),
   IN memo VARCHAR(255),
   OUT result TINYINT
-) BEGIN CALL `banking_system_project`.`transfer`(
+) 
+BEGIN 
+  CALL `banking_system_project`.`transfer`(
   fromAccountNumber,
   fromAccountType,
   NULL,

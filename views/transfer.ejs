@@ -1,93 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bootstrap 5 Login Form Example</title>
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="font/bootstrap-icons.css" />
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+
+
+    <script>
+        $(document).ready(function(){
+            $("#staticBackdrop").modal('show');
+        });
+    </script>
+    
 
     <%- include('partials/favico') %>
 
     <script>
-        function checkPassword(event) {}
+      function checkTransfer(event) {}
     </script>
+  </head>
 
-</head>
-
-<body>
+  <body>
     <%- include('partials/navbar') %>
 
-    <div class="container-fluid vh-100" style="margin-top:10px">
-        <div class="" style="margin-top:100px">
-            <div class="rounded d-flex justify-content-center">
-                <div class="col-md-4 col-sm-12 shadow-lg p-5 bg-light">
-                    <div class="text-center">
-                        <h3 class="text-primary">Bank</h3>
-                        <h4 class="text-primary">Transfer</h4>
-                    </div>
-                    <form onSubmit="return checkPassword(event);" method="post">
-                        <div class="p-4">
-
-                            <!-- From -->
-                            <div class="input-group mb-3">
-                                <span class="input-group-text bg-primary">
-                                    <i class="bi bi-bank text-white"></i>
-                                </span>
-                                <select id="fromAccount" name="fromAccount" class="form-select" required>
-                                    <option hidden disabled selected value> -- From Account -- </option>
-                                    <option value="checking">Checking</option>
-                                    <option value="savings">Savings</option>
-                                </select>
-                            </div>
-
-                                <!-- To -->
-                                <div class="input-group mb-3">
-                                    <span class="input-group-text bg-primary">
-                                        <i class="bi bi-wallet text-white"></i>
-                                    </span>
-                                    <input id="toAccount" name="toAccount" type="text" class="form-control"
-                                        placeholder="To Account">
-                                </div>
-
-                                <!-- Select Amount -->
-                                <div class="input-group mb-3">
-                                    <span class="input-group-text bg-primary">
-                                        <i class="bi bi-currency-dollar text-white"></i>
-                                    </span>
-                                    <input id="amount" name="amount" type="number" min="1" step="any" class="form-control"
-                                        placeholder="Amount">
-                                </div>
-
-                                <!-- Memo -->
-                                <div class="input-group mb-3">
-                                    <span class="input-group-text bg-primary">
-                                        <i class="bi bi-card-text text-white"></i>
-                                    </span>
-                                    <input id="memo" name="memo" type="text" class="form-control"
-                                        placeholder="Memo">
-                                </div>
-
-                            <!-- This is the password that gets sent even though they are hidden -->
-                            <div class="text-center">
-                                <button class="btn btn-primary text-center mt-2" type="submit">
-                                    Send Funds
-                                </button>
-                            </div>
-                            <% if (typeof message != 'undefined') { %>
-                                <div class="text-center" style="height:25px"><%=message%> </div>
-                                    <% } %>
-                        </div>
-                    </form>
-                </div>
+    <div class="container-fluid vh-100" style="margin-top: 10px">
+      <div class="" style="margin-top: 100px">
+        <div class="rounded d-flex justify-content-center">
+          <div class="col-md-4 col-sm-12 shadow-lg p-5 bg-light">
+            <div class="text-center">
+              <h3 class="text-primary">Bank</h3>
+              <h4 class="text-primary">Transfer</h4>
             </div>
-        </div>
-    </div>
-</body>
+            <form onSubmit="return checkTransfer(event);" method="post">
+              <div class="p-4">
+                <!-- From -->
+                <div class="input-group mb-3">
+                  <span class="input-group-text bg-primary">
+                    <i class="bi bi-bank text-white"></i>
+                  </span>
+                  <select
+                    id="fromAccount"
+                    name="fromAccount"
+                    class="form-select"
+                    required
+                  >
+                    <option selected value>-- From Account --</option>
+                    <option value="1">From checking</option>
+                    <option value="2">From savings</option>
+                  </select>
+                </div>
 
+                <!-- To -->
+                <div class="input-group mb-3">
+                  <span class="input-group-text bg-primary">
+                    <i class="bi bi-wallet text-white"></i>
+                  </span>
+                  <input
+                    id="toAccount"
+                    name="toAccount"
+                    type="text"
+                    class="form-control"
+                    placeholder="To Account"
+                  />
+                </div>
+                <!-- To account type -->
+                <div class="input-group mb-3">
+                  <span class="input-group-text bg-primary">
+                    <i class="bi bi-bank text-white"></i>
+                  </span>
+                  <select
+                    id="toAccountType"
+                    name="toAccountType"
+                    class="form-select"
+                    required
+                  >
+                    <option selected value>-- To Account --</option>
+                    <option value="1">Checking</option>
+                    <option value="2">Savings</option>
+                  </select>
+                </div>
+
+                <!-- Select Amount -->
+                <div class="input-group mb-3">
+                  <span class="input-group-text bg-primary">
+                    <i class="bi bi-currency-dollar text-white"></i>
+                  </span>
+                  <input
+                    id="amount"
+                    name="amount"
+                    type="number"
+                    min="1"
+                    step="any"
+                    class="form-control"
+                    placeholder="Amount"
+                  />
+                </div>
+
+                <!-- Memo -->
+                <div class="input-group mb-3">
+                  <span class="input-group-text bg-primary">
+                    <i class="bi bi-card-text text-white"></i>
+                  </span>
+                  <input
+                    id="memo"
+                    name="memo"
+                    type="text"
+                    class="form-control"
+                    placeholder="Memo"
+                  />
+                </div>
+
+                <!-- This is the password that gets sent even though they are hidden -->
+                <div class="text-center">
+                  <button
+                    class="btn btn-primary text-center mt-2"
+                    type="submit"
+                  >
+                    Send Funds
+                  </button>
+                </div>
+              </div>
+            </form>
+            <% if (typeof message != 'undefined') { %>
+                <!-- Vertically centered modal -->
+                <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                          <h1 class="modal-title fs-5" id="staticBackdropLabel">Transfer Status</h1>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p><%- locals.message %></p>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                      </div>                  
+                </div>
+                </div>
+                <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
