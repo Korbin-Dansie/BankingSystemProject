@@ -28,6 +28,13 @@
                     <div class="text-center">
                         <h3 class="text-primary">Transaction</h3>
                     </div>
+                    <!-- display Account info -->
+                    <div>
+                        <p>Name: <%= locals.firstName %> <%= locals.lastName %></p>
+                        <p>Checking Account: <%= locals.checkingAccount %></p>
+                        <p>Saving Account: <%= locals.savingAccount %></p>
+                    </div>
+                    <!-- end of display Account info -->
                     <form action="/landingPage" onSubmit="return checkPassword(event);" method="post">
                         <div class="p-4">
                             <div class="input-group mb-3">
