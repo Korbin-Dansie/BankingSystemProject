@@ -17,31 +17,46 @@ router.post("/", function (req, res, next) {
     res.redirect("/");
   } 
   // We know if its a withdraw of deposit so do that action
-  else if(req.body.amount && req.body.accountType && req.body.administration){
+  else if(req.body.amount && req.body.accountType && req.body.administration && req.body.accountNumber){
     console.log('transactPage.js deposit/withdraw');
 
     const accountNumber = req.body.accountNumber;
     const accountType = req.body.accountType;
     const amount = req.body.amount;
+    const memo = req.body.memo;
 
+          // Get the customers accounts
+          const formatter = new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD",
+          });
+    
+          const formatedAmount = formatter.format(amount);
+    
     // is it a deposit
     if(req.body.administration == 'deposit'){
-      const sql = "CALL deposit(?,?,?, NULL, @result)";
-      dbCon.query(sql, [accountNumber, accountType, amount], function(err, rows){
+      const sql = "CALL deposit(?,?,?, ?, @result)";
+      dbCon.query(sql, [accountNumber, accountType, amount, memo], function(err, rows){
         if(err){
           throw err;
         }
-        res.redirect('/');
+        res.render('transactPageSuccessful', {
+          message: 'Succesfuly deposited ' + formatedAmount + ' into account #' + accountNumber,
+          accountNumber: accountNumber
+        });
       });
     }
     // is it a withdraw
     else{
       const sql = "CALL withdraw(?,?,?, NULL, @result)";
-      dbCon.query(sql, [accountNumber, accountType, amount], function(err, rows){
+      dbCon.query(sql, [accountNumber, accountType, amount, memo], function(err, rows){
         if(err){
           throw err;
         }
-        res.redirect('/');
+        res.render('transactPageSuccessful', {
+          message: 'Succesfuly withdrawed ' + formatedAmount + ' into account #' + accountNumber,
+          accountNumber: accountNumber
+        });
       });
     }
   }
