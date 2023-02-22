@@ -13,20 +13,38 @@
       crossorigin="anonymous"
     ></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
-
-
     <script>
         $(document).ready(function(){
             $("#staticBackdrop").modal('show');
         });
     </script>
-    
-
-    <%- include('partials/favico') %>
-
     <script>
-      function checkTransfer(event) {}
+      function checkTransfer(event){
+        const messageElement = document.getElementById('message');
+        messageElement.innerText = "";
+        const toAccount = document.getElementById('toAccount').value;
+        const amount = document.getElementById('amount').value;
+        if(isNaN(toAccount)){
+          messageElement.innerText = "To account number is not a number";
+          event.preventDefault();
+        }
+        else if(isNaN(amount)){
+          messageElement.innerText = "Amount is not a number";
+          event.preventDefault();
+        }
+        // Amount contains a decimal
+        // https://stackoverflow.com/questions/9838809/check-if-number-string-contains-decimal
+        else if(amount > Math.floor(amount)){
+          // If there are to many decimal places
+          const decimalPlaces = amount.split(".")[1].length;
+          if(decimalPlaces > 2){
+            messageElement.innerText = "To many decimal places in amount";
+            event.preventDefault();
+          }
+        }
+      }
     </script>
+    <%- include('partials/favico') %>
   </head>
 
   <body>
@@ -127,6 +145,10 @@
                   >
                     Send Funds
                   </button>
+                </div>
+                <div>
+                  <p id="message" class="text-danger">
+                  </p>
                 </div>
               </div>
             </form>
