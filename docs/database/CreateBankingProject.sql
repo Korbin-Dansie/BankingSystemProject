@@ -18,6 +18,10 @@ DROP PROCEDURE IF EXISTS `change_user_type`; -- Create a new user type using a s
 DROP PROCEDURE IF EXISTS `create_account`; -- Create a sub account
 DROP PROCEDURE IF EXISTS `create_account_number`; -- Create a account number
 
+DROP PROCEDURE IF EXISTS `getUserRole`; -- Gets if account number is an customer, employee, or admin
+DROP PROCEDURE IF EXISTS `setUserRole`; -- updates the account numbers user role
+
+
 DROP PROCEDURE IF EXISTS `getAccountID`; -- Returns account.account_id
 DROP PROCEDURE IF EXISTS `getAccountName`; -- Returns firstName and lastName
 
@@ -240,6 +244,33 @@ CREATE PROCEDURE IF NOT EXISTS `create_account_number`(IN user_id int, OUT accou
 INSERT INTO `account_number` (`user_id`)
 VALUES (user_id);
 SELECT LAST_INSERT_ID() INTO accountNumber;
+END
+$$ DELIMITER ;
+
+/***************************************************************
+ * Create getUserRole
+ ***************************************************************/
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS `getUserRole`(IN account_number INT)
+BEGIN
+	SELECT ut.user_type
+    FROM account_number AS an
+    INNER JOIN `user` AS u ON an.user_id = u.user_id
+    INNER JOIN `user_type` AS ut ON u.user_role_id = ut.user_type_id
+    WHERE an.account_number = account_number;
+END
+$$ DELIMITER ;
+/***************************************************************
+ * Create setUserRole
+ ***************************************************************/
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS `setUserRole`(IN account_number INT, IN user_type_id TINYINT)
+BEGIN
+	UPDATE `user` AS u
+		INNER JOIN `account_number` AS an ON an.user_id = u.user_id
+    SET u.user_role_id = user_type_id
+    WHERE an.account_number = account_number
+    LIMIT 1;
 END
 $$ DELIMITER ;
 
