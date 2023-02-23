@@ -83,17 +83,15 @@ router.post("/", function (req, res, next) {
       const savingAccountNumber = rows[0][1].balance;
 
       // Get user fist and last name
-      const sql = "SELECT u.user_first_name as firstName, u.user_last_name as lastName \n" +
-      "FROM `user` as u \n" +
-      "INNER JOIN `account_number` AS an ON an.user_id = u.user_id \n" +
-      "WHERE an.account_number = ?;";
+      const sql = "CALL getAccountName(?);";
       dbCon.query(sql, [accountNumber], function(err, rows){
         if(err){
           throw err;
         }
-        console.log(rows[0]);
-        const firstName = rows[0].firstName;
-        const lastName = rows[0].lastName;
+        console.log(rows[0][0]);
+
+        const firstName = rows[0][0].firstName;
+        const lastName = rows[0][0].lastName;
 
         res.render("transactPageResults", {
           checkingAccount: checkingAccountBalance,
