@@ -257,7 +257,8 @@ BEGIN
     FROM account_number AS an
     INNER JOIN `user` AS u ON an.user_id = u.user_id
     INNER JOIN `user_type` AS ut ON u.user_role_id = ut.user_type_id
-    WHERE an.account_number = account_number;
+    WHERE an.account_number = account_number
+    LIMIT 1;
 END
 $$ DELIMITER ;
 /***************************************************************
