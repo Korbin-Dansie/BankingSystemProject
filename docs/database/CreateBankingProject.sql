@@ -652,12 +652,12 @@ $$ DELIMITER ;
  * Create change_password
  ***************************************************************/
 DELIMITER $$
-CREATE PROCEDURE IF NOT EXISTS `change_password`(IN accountNumber INT, IN hashed_password VARCHAR(255)) 
+CREATE PROCEDURE IF NOT EXISTS `change_password`(IN accountNumber INT, IN hashed_password VARCHAR(255), IN salt VARCHAR(255)) 
 BEGIN
 	UPDATE `user` AS u
     INNER JOIN `account_number` AS an ON an.user_id = u.user_id
-    SET u.hashed_password = hashed_password
-    WHERE an.accountNumber = accountNumber
+    SET u.hashed_password = hashed_password, u.salt = salt
+    WHERE an.account_number = accountNumber
     LIMIT 1;
 END 
 $$ DELIMITER ;
