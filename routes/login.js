@@ -39,7 +39,7 @@ router.post("/", function (req, res, next) {
         req.session.loggedIn = true;
                 // Nested query - to set userRole
                 let sql =
-                "SELECT * FROM `user` AS u INNER JOIN `account_number` as `an` ON an.user_id = u.user_id WHERE an.account_number = ?;";
+                "SELECT u.user_role_id FROM `user` AS u INNER JOIN `account_number` as `an` ON an.user_id = u.user_id WHERE an.account_number = ?;";
               dbCon.query(sql, [accountNumber], function (err, rows) {
                 if (err) {
                   throw err;
