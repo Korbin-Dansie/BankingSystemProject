@@ -45,7 +45,6 @@ router.post("/", function (req, res, next) {
         const result = rows[1][0]['@result'];
         if(result){
           const icon = "<i class=\"pull-right text-success bi bi-check-circle-fill \"></i>";
-          res.
           res.render("transfer", { message: icon +  " Transaction Successful" });
         }
         // If transaction is not good display an error
