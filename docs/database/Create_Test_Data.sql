@@ -133,5 +133,3 @@ CALL `get_account_balance`(@accountNumber1);
 
 SELECT 'sum_get_account_balance' AS '';
 CALL `sum_get_account_balance`(@accountNumber1);
-
- 

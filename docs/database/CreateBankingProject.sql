@@ -19,6 +19,7 @@ DROP PROCEDURE IF EXISTS `create_account`; -- Create a sub account
 DROP PROCEDURE IF EXISTS `create_account_number`; -- Create a account number
 
 DROP PROCEDURE IF EXISTS `getAccountID`; -- Returns account.account_id
+DROP PROCEDURE IF EXISTS `getAccountName`; -- Returns firstName and lastName
 
 DROP PROCEDURE IF EXISTS `get_balance`; -- Returns balance from account number and type
 DROP PROCEDURE IF EXISTS `get_balance_by_account_id`; -- Returns balance from account_id
@@ -32,7 +33,9 @@ DROP PROCEDURE IF EXISTS `get_transaction_history`; -- Return a table of all the
 DROP PROCEDURE IF EXISTS `get_account_transaction_history`; -- Returns all the transactions a user has done
 
 DROP PROCEDURE IF EXISTS `check_credentials`; -- check if account number and hashed_password match
+DROP PROCEDURE IF EXISTS `check_accountNumber`; -- See if an account exists at that account number
 DROP PROCEDURE IF EXISTS `get_salt`; -- Get the salt from the user with the account number
+DROP PROCEDURE IF EXISTS `change_password`; -- Get the salt from the user with the account number
 
 DROP TRIGGER IF EXISTS `trigger_add_new_transaction`; -- Updates account amount on new row added
 DROP TRIGGER IF EXISTS `trigger_update_new_transaction`; -- Updates account amount on new row added
@@ -255,6 +258,20 @@ WHERE a.account_number = account_number
   AND a.account_type_id = account_type INTO account_ID;
 END
 $$ DELIMITER ;
+/***************************************************************
+ * Create getAccountName
+ ***************************************************************/
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS `getAccountName`(
+  IN account_number INT
+) BEGIN
+SELECT u.user_first_name AS firstName, u.user_last_name AS lastName
+FROM `user` AS u
+INNER JOIN account_number AS an ON an.user_id = u.user_id
+WHERE an.account_number = account_number;
+END
+$$ DELIMITER ;
+
 /***************************************************************
  * Create sum_get_balance
  ***************************************************************/
@@ -532,7 +549,7 @@ BEGIN
 END
 $$ DELIMITER ;
 /***************************************************************
- * Create get_account_balance
+ * Create get_transaction_history
  ***************************************************************/
 DELIMITER $$
 CREATE PROCEDURE IF NOT EXISTS `get_transaction_history`(
@@ -560,7 +577,7 @@ ORDER BY t.transaction_id DESC;
 END
 $$ DELIMITER ;
 /***************************************************************
- * Create get_account_balance
+ * Create get_account_transaction_history
  * returns a table of all the transactions for a user
  ***************************************************************/
 DELIMITER $$
@@ -602,6 +619,24 @@ SELECT EXISTS(
   ) AS result;
 END
 $$ DELIMITER ;
+
+/***************************************************************
+ * Create check_accountNumber
+ * returns a row of result
+ * 0 = No user found, 1 = User found
+ ***************************************************************/
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS `check_accountNumber`(IN accountNumber INT)
+BEGIN
+SELECT EXISTS(
+    SELECT *
+    FROM `user` AS u
+      INNER JOIN `account_number` AS an ON u.user_id = an.user_id
+    WHERE an.account_number = accountNumber
+  ) AS result;
+END
+$$ DELIMITER ;
+
 /***************************************************************
  * Create get_salt
  ***************************************************************/
@@ -611,6 +646,19 @@ SELECT u.salt
 FROM `user` AS u
   INNER JOIN account_number AS an ON u.user_id = an.user_id
 WHERE an.account_number = accountNumber;
+END 
+$$ DELIMITER ;
+/***************************************************************
+ * Create change_password
+ ***************************************************************/
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS `change_password`(IN accountNumber INT, IN hashed_password VARCHAR(255)) 
+BEGIN
+	UPDATE `user` AS u
+    INNER JOIN `account_number` AS an ON an.user_id = u.user_id
+    SET u.hashed_password = hashed_password
+    WHERE an.accountNumber = accountNumber
+    LIMIT 1;
 END 
 $$ DELIMITER ;
 
