@@ -12,54 +12,69 @@ router.get('/', function(req, res, next) {
 router.post('/', function(req, res, next) {
   console.log('changePassword: POST');
 
-  const accountNumber = req.body.accountNumber;
+  let obj = new Object();
+  obj.accountNumber = req.body.accountNumber;
 
-  //Check if they sumited the updated password
+  //Check if they submited the updated password
   if(req.body.hash && req.body.salt){
-    const hash = req.body.hash;
-    const salt = req.body.salt;
-    const sql = "CALL change_password(?,?,?);";
-    dbCon.query(sql, [accountNumber, hash, salt], function(err, rows){
-      if(err){
-        throw err;
-      }
-      
-      // Go to landing page
-      res.redirect('/');
-    })
+    obj.hash = req.body.hash;
+    obj.salt = req.body.salt;
+    changePassword(obj, res);
   }
-
+  // Check if they are looking for the account number
   else{
+    step1(obj, res);
+  }
+});
+
+// Have all the information so update the password
+function changePassword(obj, res){
+  const sql = "CALL change_password(?,?,?);";
+  dbCon.query(sql, [obj.accountNumber, obj.hash, obj.salt], function(err, rows){
+    if(err){
+      throw err;
+    }
+    // Go to landing page
+    res.redirect('/');
+  });
+}
+
+// See if account number exists
+function step1(obj, res){
   // Check if account exists
   const sql = "CALL check_accountNumber(?);";
-  dbCon.query(sql, [accountNumber], function(err,rows){
+  dbCon.query(sql, [obj.accountNumber], function(err,rows){
     if(err){
       throw err;
     }
 
     console.log(rows[0]);
+    console.log(obj);
     // if account does not exist
     if(rows[0][0].result == 0){
-      res.render('changePassword', { message: 'Account number: ' + accountNumber + " does not exist."});
+      res.render('changePassword', { message: 'Account number: ' + obj.accountNumber + " does not exist."});
     }
     // If account does exist
     else{
+      step2(obj, res);
+    }
+  });
+}
+
+// If the account exists gets the name to display on the result page
+function step2(obj, res){
       // If it exists display user name
       const sql = 'CALL getAccountName(?);';
-      dbCon.query(sql, [accountNumber], function(err, rows){
+      dbCon.query(sql, [obj.accountNumber], function(err, rows){
         if(err){
           throw err;
         }
         console.log(rows[0]);
-        const firstName = rows[0][0].firstName;
-        const lastName = rows[0][0].lastName;
+        obj.firstName = rows[0][0].firstName;
+        obj.lastName = rows[0][0].lastName;
         // Get their salt
-        res.render('changePasswordResult', {accountNumber: accountNumber, lastName: lastName, firstName: firstName});
-
-      })
-    }
-  });
-  }
-});
+        res.render('changePasswordResult', {accountNumber: obj.accountNumber, lastName: obj.lastName, firstName: obj.firstName});
+      });
+}
 
 module.exports = router;

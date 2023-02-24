@@ -7,12 +7,17 @@ router.get("/", function (req, res, next) {
   if (!req.session.loggedIn || req.session.loggedIn == false) {
     res.redirect("/");
   } else {
+    // Get the account number
     res.render("transactPage", {});
   }
 });
 
 router.post("/", function (req, res, next) {
   console.log('transactPage.js POST');
+
+  let obj = new Object();
+  obj.accountNumber = req.body.accountNumber;
+
   if (!req.session.loggedIn || req.session.loggedIn == false) {
     res.redirect("/");
   } 
@@ -20,106 +25,125 @@ router.post("/", function (req, res, next) {
   else if(req.body.amount && req.body.accountType && req.body.administration && req.body.accountNumber){
     console.log('transactPage.js deposit/withdraw');
 
-    const accountNumber = req.body.accountNumber;
-    const accountType = req.body.accountType;
-    const amount = req.body.amount;
-    const memo = req.body.memo;
+    obj.accountNumber = req.body.accountNumber;
+    obj.accountType = req.body.accountType;
+    obj.amount = req.body.amount;
+    obj.memo = req.body.memo;
+    obj.administration = req.body.administration;
+    step1TransactSuccess(obj,res);
+  }
+  // Have the account number - so disaplay if they want to do a deposit/withdraw
+  else {
+    step1Transact(obj, res)
+  }
+});
 
+
+// Make sure the account number is valid
+function step1Transact(obj, res){
+  console.log('transactPage.js get info to deposit/withdraw');
+
+  //Check to make sure account exists
+  const sql = "CALL check_accountNumber(?);";
+  dbCon.query(sql, [obj.accountNumber], function(err,rows){
+    if(err){
+      throw err;
+    }
+
+    console.log(rows[0]);
+    // if account does not exist
+    if(rows[0][0].result == 0){
+      res.render('transactPage', { message: 'Account number: ' + obj.accountNumber + " does not exist."});
+    }else{
+      step2Transact(obj, res);
+    }
+  });
+}
+
+// Get account balance
+function step2Transact(obj, res){
+  const sql = "CALL get_account_balance(?)";
+  dbCon.query(sql, [obj.accountNumber], function (err, rows) {
+    if (err) {
+      throw err;
+    }
+
+    // Get the customers accounts
+    const formatter = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    });
+
+    obj.checkingAccountBalance = formatter.format(rows[0][0].balance);
+    obj.savingAccountBalance = formatter.format(rows[0][1].balance);
+    obj.checkingAccountNumber = rows[0][0].balance || 0;
+    obj.savingAccountNumber = rows[0][1].balance || 0;
+    step3Transact(obj, res)
+  });
+
+}
+
+// Get first and last name
+function step3Transact(obj, res){
+          // Get user fist and last name
+          const sql = "CALL getAccountName(?);";
+          dbCon.query(sql, [obj.accountNumber], function(err, rows){
+            if(err){
+              throw err;
+            }
+            console.log(rows[0][0]);
+    
+            obj.firstName = rows[0][0].firstName;
+            obj.lastName = rows[0][0].lastName;
+    
+            res.render("transactPageResults", {
+              checkingAccount: obj.checkingAccountBalance,
+              savingAccount: obj.savingAccountBalance,
+              checkingAccountNumber: obj.checkingAccountNumber,
+              savingAccountNumber: obj.savingAccountNumber,
+              firstName: obj.firstName,
+              lastName: obj.lastName,
+              accountNumber: obj.accountNumber,
+            });
+          });
+}
+
+
+function step1TransactSuccess(obj, res){
           // Get the customers accounts
           const formatter = new Intl.NumberFormat("en-US", {
             style: "currency",
             currency: "USD",
           });
     
-          const formatedAmount = formatter.format(amount);
+          obj.formatedAmount = formatter.format(obj.amount);
     
     // is it a deposit
-    if(req.body.administration == 'deposit'){
+    if(obj.administration == 'deposit'){
       const sql = "CALL deposit(?,?,?, ?, @result)";
-      dbCon.query(sql, [accountNumber, accountType, amount, memo], function(err, rows){
+      dbCon.query(sql, [obj.accountNumber, obj.accountType, obj.amount, obj.memo], function(err, rows){
         if(err){
           throw err;
         }
         res.render('transactPageSuccessful', {
-          message: 'Succesfuly deposited ' + formatedAmount + ' into account #' + accountNumber,
-          accountNumber: accountNumber
+          message: 'Successfully deposited ' + obj.formatedAmount + ' into account #' + obj.accountNumber,
+          accountNumber: obj.accountNumber
         });
       });
     }
     // is it a withdraw
     else{
       const sql = "CALL withdraw(?,?,?, NULL, @result)";
-      dbCon.query(sql, [accountNumber, accountType, amount, memo], function(err, rows){
+      dbCon.query(sql, [obj.accountNumber, obj.accountType, obj.amount, obj.memo], function(err, rows){
         if(err){
           throw err;
         }
         res.render('transactPageSuccessful', {
-          message: 'Succesfuly withdrawed ' + formatedAmount + ' into account #' + accountNumber,
-          accountNumber: accountNumber
+          message: 'Successfully withdrawed ' + obj.formatedAmount + ' from account #' + obj.accountNumber,
+          accountNumber: obj.accountNumber
         });
       });
     }
-  }
-  // Have the account number - so disaplay if they want to do a deposit/withdraw
-  else {
-    console.log('transactPage.js get info to deposit/withdraw');
-    const accountNumber = req.body.accountNumber;
-
-    //Check to make sure account exists
-    const sql = "CALL check_accountNumber(?);";
-    dbCon.query(sql, [accountNumber], function(err,rows){
-      if(err){
-        throw err;
-      }
-  
-      console.log(rows[0]);
-      // if account does not exist
-      if(rows[0][0].result == 0){
-        res.render('transactPage', { message: 'Account number: ' + accountNumber + " does not exist."});
-      }else{
-        const sql = "CALL get_account_balance(?)";
-        dbCon.query(sql, [accountNumber], function (err, rows) {
-          if (err) {
-            throw err;
-          }
-    
-          // Get the customers accounts
-          const formatter = new Intl.NumberFormat("en-US", {
-            style: "currency",
-            currency: "USD",
-          });
-    
-          const checkingAccountBalance = formatter.format(rows[0][0].balance);
-          const savingAccountBalance = formatter.format(rows[0][1].balance);
-          const checkingAccountNumber =  rows[0][0].balance;
-          const savingAccountNumber = rows[0][1].balance;
-    
-          // Get user fist and last name
-          const sql = "CALL getAccountName(?);";
-          dbCon.query(sql, [accountNumber], function(err, rows){
-            if(err){
-              throw err;
-            }
-            console.log(rows[0][0]);
-    
-            const firstName = rows[0][0].firstName;
-            const lastName = rows[0][0].lastName;
-    
-            res.render("transactPageResults", {
-              checkingAccount: checkingAccountBalance,
-              savingAccount: savingAccountBalance,
-              checkingAccountNumber: checkingAccountNumber,
-              savingAccountNumber: savingAccountNumber,
-              firstName: firstName,
-              lastName: lastName,
-              accountNumber: accountNumber,
-            });
-          });
-    
-        });
-      }
-    });
-  }
-});
+}
 
 module.exports = router;
