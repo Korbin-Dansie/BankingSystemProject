@@ -24,28 +24,34 @@ SET @accountNumber1 = 0;
 SET @accountNumber2 = 0;
 SET @accountNumber3 = 0;
 SET @successfulyCreateAccount = 0;
+
+ -- password: 1
 CALL `create_user`
 ('Korbin',
  'Dansie',
  'kd@email.com',
- 'MySuperSecurePassword',
- 'MySuperSecureSalt',
+ '629221b4647a6cabe93c7d4626e7e32e3502a515efe3f5abe1138d16424c40d4',
+ 'ee730fd0992bc435',
  1,
  @accountNumber1, @successfulyCreateAccount);
+ 
+ -- password: a
   CALL `create_user`
 ('Briella',
  'Rutherford',
  'br@email.com',
- 'FinalTestPersonPassword',
- 'FinalTestSalt',
+ '32ab5e8361f567498d72b7d921e343f281b6fd05f854517cbc6c59f9842127fe',
+ '0f6facddd543743b',
  1,
  @accountNumber2, @successfulyCreateAccount);
+ 
+ -- password: password
  CALL `create_user`
 ('Bradley',
  'Peterson',
  'bp@email.com',
- 'SomeOtherPassword',
- 'SomeOtherSalt',
+ 'fbf7b4b732f920e2286cae97c7963dae73192d016b10c4e5799a8154f14bacb1',
+ '45848b4648c209a2',
  1,
  @accountNumber3, @successfulyCreateAccount);
 SELECT @accountNumber3, @successfulyCreateAccount;
