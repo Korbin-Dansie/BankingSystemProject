@@ -5,7 +5,6 @@ var dbCon = require("../lib/database");
 /* GET home page. */
 router.get('/', function(req, res, next) {
   console.log("mange.js GET");
-
   res.render('manage', {});
 });
 
@@ -19,10 +18,12 @@ router.post('/', function(req, res, next) {
   // Check if submited updating uuser permisions
   if(req.body.administration && req.body.accountNumber){
     obj.administration = req.body.administration;
+    // From manageResults.ejs - To Home
     step1ManagePassword(obj, res);
   }
   else{
   // Check if account number exists
+  // From manage.ejs - To manageResults.ejs
   step1Manage(obj, res);
   }
 });

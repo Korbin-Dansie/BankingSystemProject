@@ -23,7 +23,8 @@ router.post('/', function(req, res, next) {
   }
   // Check if they are looking for the account number
   else{
-    step1(obj, res);
+    // From changePassword.ejs - To changePasswordResult.ejs
+    step1ChangePassword(obj, res);
   }
 });
 
@@ -40,7 +41,7 @@ function changePassword(obj, res){
 }
 
 // See if account number exists
-function step1(obj, res){
+function step1ChangePassword(obj, res){
   // Check if account exists
   const sql = "CALL check_accountNumber(?);";
   dbCon.query(sql, [obj.accountNumber], function(err,rows){
@@ -56,13 +57,13 @@ function step1(obj, res){
     }
     // If account does exist
     else{
-      step2(obj, res);
+      step2ChangePassword(obj, res);
     }
   });
 }
 
 // If the account exists gets the name to display on the result page
-function step2(obj, res){
+function step2ChangePassword(obj, res){
       // If it exists display user name
       const sql = 'CALL getAccountName(?);';
       dbCon.query(sql, [obj.accountNumber], function(err, rows){

@@ -18,6 +18,7 @@ router.post("/", function (req, res, next) {
   obj.hash = req.body.hash;
   obj.email = req.body.email;
   obj.userRole = 1;
+  // From register.ejs - To registerSuccess.ejs
   step1Register(obj, res)
 });
 

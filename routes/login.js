@@ -19,10 +19,12 @@ router.post("/", function (req, res, next) {
   if (req.body.hashedPassword) {
     obj.hashedPassword = req.body.hashedPassword;
     obj.salt = req.body.salt;
+    // From loginPassword.ejs - To Home
     step1Password(obj, res, req);
   }
   // Not logged in and have a accountNumber
   else if (req.body.accountNumber != "") {
+    // From login.ejs - To loginPassword.ejs
     step1Login(obj, res);
   }
 });

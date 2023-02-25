@@ -11,6 +11,7 @@ router.get("/", function (req, res, next) {
   if (!req.session.loggedIn || req.session.loggedIn == false) {
     res.redirect("/");
   } else {
+    // From anywhere - To transactionHistory.ejs
     step1TransactionHistory(obj, res);
   }
 });

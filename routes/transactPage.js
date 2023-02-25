@@ -30,10 +30,12 @@ router.post("/", function (req, res, next) {
     obj.amount = req.body.amount;
     obj.memo = req.body.memo;
     obj.administration = req.body.administration;
-    step1TransactSuccess(obj,res);
+    // From transactPageResults.ejs - To transactPageRSuccess.ejs
+    step1TransactResult(obj,res);
   }
   // Have the account number - so disaplay if they want to do a deposit/withdraw
   else {
+    // From transact.ejs - To transactPageResults.ejs
     step1Transact(obj, res)
   }
 });
@@ -109,7 +111,7 @@ function step3Transact(obj, res){
 }
 
 
-function step1TransactSuccess(obj, res){
+function step1TransactResult(obj, res){
           // Get the customers accounts
           const formatter = new Intl.NumberFormat("en-US", {
             style: "currency",
