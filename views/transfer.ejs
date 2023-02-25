@@ -12,32 +12,35 @@
       integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
       crossorigin="anonymous"
     ></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+      crossorigin="anonymous"
+    ></script>
     <script>
-        $(document).ready(function(){
-            $("#staticBackdrop").modal('show');
-        });
+      $(document).ready(function () {
+        $("#staticBackdrop").modal("show");
+      });
     </script>
     <script>
-      function checkTransfer(event){
-        const messageElement = document.getElementById('message');
+      function checkTransfer(event) {
+        const messageElement = document.getElementById("message");
         messageElement.innerText = "";
-        const toAccount = document.getElementById('toAccount').value;
-        const amount = document.getElementById('amount').value;
-        if(isNaN(toAccount)){
+        const toAccount = document.getElementById("toAccount").value;
+        const amount = document.getElementById("amount").value;
+        if (isNaN(toAccount)) {
           messageElement.innerText = "To account number is not a number";
           event.preventDefault();
-        }
-        else if(isNaN(amount)){
+        } else if (isNaN(amount)) {
           messageElement.innerText = "Amount is not a number";
           event.preventDefault();
         }
         // Amount contains a decimal
         // https://stackoverflow.com/questions/9838809/check-if-number-string-contains-decimal
-        else if(amount > Math.floor(amount)){
+        else if (amount > Math.floor(amount)) {
           // If there are to many decimal places
           const decimalPlaces = amount.split(".")[1].length;
-          if(decimalPlaces > 2){
+          if (decimalPlaces > 2) {
             messageElement.innerText = "To many decimal places in amount";
             event.preventDefault();
           }
@@ -57,6 +60,11 @@
             <div class="text-center">
               <h3 class="text-primary">Bank</h3>
               <h4 class="text-primary">Transfer</h4>
+            </div>
+            <!-- display Account info -->
+            <div>
+              <p>Checking Account: <%= locals.checkingAccount %></p>
+              <p>Saving Account: <%= locals.savingAccount %></p>
             </div>
             <form onSubmit="return checkTransfer(event);" method="post">
               <div class="p-4">
@@ -116,7 +124,7 @@
                     id="amount"
                     name="amount"
                     type="number"
-                    min="1"
+                    min="0.01"
                     step="any"
                     class="form-control"
                     placeholder="Amount"
@@ -147,30 +155,50 @@
                   </button>
                 </div>
                 <div>
-                  <p id="message" class="text-danger">
-                  </p>
+                  <p id="message" class="text-danger"></p>
                 </div>
               </div>
             </form>
             <% if (typeof message != 'undefined') { %>
-                <!-- Vertically centered modal -->
-                <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                          <h1 class="modal-title fs-5" id="staticBackdropLabel">Transfer Status</h1>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <p><%- locals.message %></p>
-                        </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
-                        </div>
-                      </div>                  
+            <!-- Vertically centered modal -->
+            <div
+              class="modal fade"
+              id="staticBackdrop"
+              data-bs-backdrop="static"
+              data-bs-keyboard="false"
+              tabindex="-1"
+              aria-labelledby="staticBackdropLabel"
+              aria-hidden="true"
+            >
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">
+                      Transfer Status
+                    </h1>
+                    <button
+                      type="button"
+                      class="btn-close"
+                      data-bs-dismiss="modal"
+                      aria-label="Close"
+                    ></button>
+                  </div>
+                  <div class="modal-body">
+                    <p><%- locals.message %></p>
+                  </div>
+                  <div class="modal-footer">
+                    <button
+                      type="button"
+                      class="btn btn-primary"
+                      data-bs-dismiss="modal"
+                    >
+                      Close
+                    </button>
+                  </div>
                 </div>
-                </div>
-                <% } %>
+              </div>
+            </div>
+            <% } %>
           </div>
         </div>
       </div>
