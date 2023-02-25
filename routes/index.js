@@ -3,12 +3,21 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', 
-  { title: 'Express' ,
-   accountNumber: req.session.accountNumber,
-   loggedIn: req.session.loggedIn,
-   userRole: req.session.userRole
-  });
+  
+  if (!req.session.loggedIn || req.session.loggedIn == false) {
+    res.redirect("/login");
+  } 
+  else{
+    res.redirect("/landingPage")
+  }
+  
+  // res.render('index', 
+  // { title: 'Express' ,
+  //  accountNumber: req.session.accountNumber,
+  //  loggedIn: req.session.loggedIn,
+  //  userRole: req.session.userRole
+  // });
+  
 });
 
 /* Log out*/

@@ -18,6 +18,13 @@ router.get('/', function(req, res, next) {
   }
 });
 
+/* POST home page. */
+router.post('/', function(req, res, next) {
+  // If we post to the landing page redirect to the GET
+  console.log('Landing Page: POST');
+  res.redirect('/');
+}); 
+
 function step1LandingPage(obj, res){
   let sql = "CALL get_account_balance(?);";
   dbCon.query(sql, [obj.accountNumber], function (err, rows) {
@@ -40,11 +47,5 @@ function step1LandingPage(obj, res){
   });  
 }
 
-/* POST home page. */
-router.post('/', function(req, res, next) {
-  // If we post to the landing page redirect to the GET
-  console.log('Landing Page: POST');
-  data = req.body;
-  res.redirect('/');
-}); 
+
 module.exports = router;
