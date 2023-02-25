@@ -5,6 +5,8 @@ var dbCon = require("../lib/database");
 /* GET home page. */
 router.get("/", function (req, res, next) {
   console.log("tranactionHistory.js GET");
+  res.locals.userRole = req.session.userRole;
+
   let obj = new Object();
   obj.accountNumber = req.session.accountNumber;
 

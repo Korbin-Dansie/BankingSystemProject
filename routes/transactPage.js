@@ -4,6 +4,9 @@ var dbCon = require("../lib/database");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
+  console.log("transactPage.js GET");
+  res.locals.userRole = req.session.userRole;
+
   if (!req.session.loggedIn || req.session.loggedIn == false) {
     res.redirect("/");
   } else {
@@ -23,8 +26,10 @@ router.get("/", function (req, res, next) {
   }
 });
 
+/* POST home page. */
 router.post("/", function (req, res, next) {
   console.log("transactPage.js POST");
+  res.locals.userRole = req.session.userRole;
 
   let obj = new Object();
   obj.accountNumber = req.body.accountNumber;

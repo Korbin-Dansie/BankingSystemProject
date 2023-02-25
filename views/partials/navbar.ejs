@@ -27,18 +27,26 @@
       <li class="nav-item">
         <a class="nav-link" href="/transactionHistory">History</a>
       </li>
+      <% if(Number(locals.userRole) == 2) {%>
       <li class="nav-item">
         <a class="nav-link" href="/transact">Deposit / Withdraw</a>
       </li>
+      <% } %>
+      <% if(Number(locals.userRole) == 2 || Number(locals.userRole) == 3) {%>
       <li class="nav-item">
         <a class="nav-link" href="/register">Register</a>
       </li>
+      <% } %>
       <li class="nav-item">
         <a class="nav-link" href="/changePassword">Change Password</a>
       </li>
+      <% if(Number(locals.userRole) == 3) {%>
+
       <li class="nav-item">
         <a class="nav-link" href="/managePermissions">Manage Permisions</a>
       </li>
+      <% } %>
+
       <li class="nav-item">
         <a class="nav-link" href="/logout">Log out</a>
       </li>

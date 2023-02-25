@@ -5,6 +5,8 @@ var dbCon = require("../lib/database");
 /* GET home page. */
 router.get("/", function (req, res, next) {
   console.log("mange.js GET");
+  res.locals.userRole = req.session.userRole;
+
 
   if (!req.session.loggedIn || req.session.loggedIn == false) {
     res.redirect("/");
@@ -26,6 +28,7 @@ router.get("/", function (req, res, next) {
 
 router.post("/", function (req, res, next) {
   console.log("mange.js POST");
+  res.locals.userRole = req.session.userRole;
 
   if (!req.session.loggedIn || req.session.loggedIn == false) {
     res.redirect("/");

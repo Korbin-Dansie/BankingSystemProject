@@ -6,6 +6,7 @@ var dbCon = require("../lib/database");
 router.get("/", function (req, res, next) {
   console.log("changePassword: GET");
   let obj = new Object();
+  res.locals.userRole = req.session.userRole;
 
   if (!req.session.loggedIn || req.session.loggedIn == false) {
     res.redirect("/");
@@ -13,12 +14,10 @@ router.get("/", function (req, res, next) {
     switch (Number(req.session.userRole)) {
       // Customer - Go to change password page
       case 1:
-        obj.accountNumber = req.session.accountNumber;
-        step1ChangePassword(obj, res);
-        break;
       // Employee
       case 2:
-        res.redirect("/");
+        obj.accountNumber = req.session.accountNumber;
+        step1ChangePassword(obj, res);
         break;
       // Admin - Go to select account page
       case 3:
@@ -31,20 +30,23 @@ router.get("/", function (req, res, next) {
 /* POST home page. */
 router.post("/", function (req, res, next) {
   console.log("changePassword: POST");
+  res.locals.userRole = req.session.userRole;
 
   let obj = new Object();
   obj.accountNumber = req.body.accountNumber;
 
   if (!req.session.loggedIn || req.session.loggedIn == false) {
     res.redirect("/");
-  } 
+  }
   // Else they are logged in so go based on their role
   else {
     switch (Number(req.session.userRole)) {
-      // Customer - Get theier account number from session
+      // Customer - Get their account number from session
       case 1:
+      // Employee - Get their account number from session
+      case 2:
         obj.accountNumber = req.session.accountNumber;
-      // Admin
+      // admin
       case 3:
         //Check if they submited the updated password
         if (req.body.hash && req.body.salt) {
@@ -56,10 +58,7 @@ router.post("/", function (req, res, next) {
         else {
           // From changePassword.ejs - To changePasswordResult.ejs
           step1ChangePassword(obj, res);
-        }        break;
-      // Employee
-      case 2:
-        res.redirect("/");
+        }
         break;
     }
   }

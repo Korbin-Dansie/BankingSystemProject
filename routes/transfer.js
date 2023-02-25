@@ -4,7 +4,9 @@ var dbCon = require("../lib/database");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  console.log("transfer.js POST");
+  console.log("transfer.js GET");
+  res.locals.userRole = req.session.userRole;
+
   let obj = new Object();
   obj.accountNumber = req.session.accountNumber;
 
@@ -15,9 +17,11 @@ router.get("/", function (req, res, next) {
   }
 });
 
-/* GET home page. */
+/* POST home page. */
 router.post("/", function (req, res, next) {
   console.log("transfer.js POST");
+  res.locals.userRole = req.session.userRole;
+
   let obj = new Object();
 
   obj.accountNumber = req.session.accountNumber;

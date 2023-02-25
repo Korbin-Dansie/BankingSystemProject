@@ -5,6 +5,7 @@ var dbCon = require("../lib/database");
 /* GET home page. */
 router.get('/', function(req, res, next) {
   console.log('Landing Page: GET');
+  res.locals.userRole = req.session.userRole;
 
   let obj = new Object();
   obj.accountNumber = req.session.accountNumber;
@@ -22,6 +23,8 @@ router.get('/', function(req, res, next) {
 router.post('/', function(req, res, next) {
   // If we post to the landing page redirect to the GET
   console.log('Landing Page: POST');
+  res.locals.userRole = req.session.userRole;
+
   res.redirect('/');
 }); 
 
