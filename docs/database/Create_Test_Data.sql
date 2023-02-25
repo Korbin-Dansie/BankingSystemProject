@@ -35,23 +35,23 @@ CALL `create_user`
  1,
  @accountNumber1, @successfulyCreateAccount);
  
- -- password: a
+ -- password: 2
   CALL `create_user`
 ('Briella',
  'Rutherford',
  'br@email.com',
- '32ab5e8361f567498d72b7d921e343f281b6fd05f854517cbc6c59f9842127fe',
- '0f6facddd543743b',
+ '44fd96315b55086a9cbec3fb0924004360ade4f0a8dac106a53e91e8161aa790',
+ 'f388482e9d75bcbd',
  1,
  @accountNumber2, @successfulyCreateAccount);
  
- -- password: password
+ -- password: 3
  CALL `create_user`
 ('Bradley',
  'Peterson',
  'bp@email.com',
- 'fbf7b4b732f920e2286cae97c7963dae73192d016b10c4e5799a8154f14bacb1',
- '45848b4648c209a2',
+ '0a1508c325bf5d1c8bc1bb8b3886660635974a44697043ad1882fb7299061edc',
+ '7eb69987aa86a0ad',
  1,
  @accountNumber3, @successfulyCreateAccount);
 SELECT @accountNumber3, @successfulyCreateAccount;
