@@ -64,7 +64,7 @@ function step1TransferGet(obj, res) {
 }
 
 // Transfer the money
-function step2TransferPost(obj, res) {
+function step1TransferPost(obj, res) {
   // If feilds are empty do not accept query
   const sql = "CALL `user_transfer`(?,?,?,?,?,?,@result); select @result;";
   dbCon.query(
@@ -86,30 +86,15 @@ function step2TransferPost(obj, res) {
       console.log("Transaction Result: 1=Good, 0=Bad");
       console.log(rows[1][0]["@result"]);
       const result = rows[1][0]["@result"];
-      if (result) {
-        const icon =
-          '<i class="pull-right text-success bi bi-check-circle-fill "></i>';
-        res.render("transfer", { message: icon + " Transaction Successful",      checkingAccount: obj.checkingAccountBalance,
-        savingAccount: obj.savingAccountBalance,
-   });
-      }
-      // If transaction is not good display an error
-      else {
-        const icon =
-          '<i class="pull-right text-danger bi bi-x-circle-fill "></i>';
-        res.render("transfer", {
-          message: icon + " There was an error with the transaction",      checkingAccount: obj.checkingAccountBalance,
-          savingAccount: obj.savingAccountBalance,
-    
-        });
-      }
+      obj.result = result;
+      step2TransferPost(obj, res);
     }
   );
 }
 
 
 // Get the current balance of the bankaccounts
-function step1TransferPost(obj, res) {
+function step2TransferPost(obj, res) {
   const sql = "CALL get_account_balance(?)";
   dbCon.query(sql, [obj.accountNumber], function (err, rows) {
     if (err) {
@@ -126,7 +111,23 @@ function step1TransferPost(obj, res) {
     obj.savingAccountBalance = formatter.format(rows[0][1].balance);
     // obj.checkingAccountNumber = rows[0][0].balance || 0;
     // obj.savingAccountNumber = rows[0][1].balance || 0;
-    step2TransferPost(obj, res);
+    if (obj.result) {
+      const icon =
+        '<i class="pull-right text-success bi bi-check-circle-fill "></i>';
+      res.render("transfer", { message: icon + " Transaction Successful",      checkingAccount: obj.checkingAccountBalance,
+      savingAccount: obj.savingAccountBalance,
+ });
+    }
+    // If transaction is not good display an error
+    else {
+      const icon =
+        '<i class="pull-right text-danger bi bi-x-circle-fill "></i>';
+      res.render("transfer", {
+        message: icon + " There was an error with the transaction",      checkingAccount: obj.checkingAccountBalance,
+        savingAccount: obj.savingAccountBalance,
+  
+      });
+    }
   });
 }
 

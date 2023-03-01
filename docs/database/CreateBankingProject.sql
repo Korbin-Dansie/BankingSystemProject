@@ -582,6 +582,7 @@ END
 $$ DELIMITER ;
 /***************************************************************
  * Create get_transaction_history
+  * if updated make sure to update get_account_transaction_history
  ***************************************************************/
 DELIMITER $$
 CREATE PROCEDURE IF NOT EXISTS `get_transaction_history`(
@@ -596,13 +597,17 @@ SELECT a.account_type_id,
   END AS 'isDeposit',
   t.transaction_amount,
   t.memo,
-  t.transaction_time
+  t.transaction_time,
+  other_a.account_number AS other_account_number
 FROM account_number AS an
   INNER JOIN `account` as a ON a.account_number = an.account_number
   INNER JOIN `transaction` as t ON (
     (t.from_account_id = a.account_id)
     OR (t.to_account_id = a.account_id)
-  )
+  )    
+  LEFT JOIN `account` as other_a ON #Left join to get deposit and withdraws. Join on the other account_id number
+	(t.from_account_id = other_a.account_id AND !(t.from_account_id = a.account_id))
+    OR (t.to_account_id = other_a.account_id AND !(t.to_account_id = a.account_id))
 WHERE an.account_number = accountNumber
   AND a.account_type_id = accountType
 ORDER BY t.transaction_id DESC;
@@ -611,6 +616,7 @@ $$ DELIMITER ;
 /***************************************************************
  * Create get_account_transaction_history
  * returns a table of all the transactions for a user
+ * if updated make sure to update get_transaction_history
  ***************************************************************/
 DELIMITER $$
 CREATE PROCEDURE IF NOT EXISTS `get_account_transaction_history`(IN accountNumber INT) BEGIN
@@ -622,13 +628,16 @@ SELECT a.account_type_id,
   END AS 'isDeposit',
   t.transaction_amount,
   t.memo,
-  t.transaction_time
+  t.transaction_time,
+  other_a.account_number AS other_account_number
 FROM account_number AS an
   INNER JOIN `account` as a ON a.account_number = an.account_number
   INNER JOIN `transaction` as t ON (
     (t.from_account_id = a.account_id)
-    OR (t.to_account_id = a.account_id)
-  )
+    OR (t.to_account_id = a.account_id))
+    LEFT JOIN `account` as other_a ON #Left join to get deposit and withdraws. Join on the other account_id number
+	(t.from_account_id = other_a.account_id AND !(t.from_account_id = a.account_id))
+    OR (t.to_account_id = other_a.account_id AND !(t.to_account_id = a.account_id))
 WHERE an.account_number = accountNumber  
 ORDER BY t.transaction_id DESC;
 
