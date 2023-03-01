@@ -16,8 +16,7 @@ router.get("/", function (req, res, next) {
       case 1:
       // Employee
       case 2:
-        obj.accountNumber = req.session.accountNumber;
-        step1ChangePassword(obj, res);
+        res.redirect("/");
         break;
       // Admin - Go to select account page
       case 3:
