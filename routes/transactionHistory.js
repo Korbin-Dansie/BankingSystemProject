@@ -18,16 +18,15 @@ router.get("/", function (req, res, next) {
     switch (Number(req.session.userRole)) {
       // Customer -
       case 1:
-       // Admin - 
-      case 3:
         obj.accountNumber = req.session.accountNumber;
         step1TransactionHistory(obj, res);
         break;
-      // Employee
+      // Employee -
       case 2:
+      // Admin -
+      case 3:
         res.render("transactionHistorySelect");
         break;
-
     }
   }
 });
@@ -42,16 +41,15 @@ router.post("/", function (req, res, next) {
 
   if (!req.session.loggedIn || req.session.loggedIn == false) {
     res.redirect("/");
-  }
-  else{
+  } else {
     switch (Number(req.session.userRole)) {
       // Customer -
       case 1:
-       // Admin - 
-      case 3:
-        obj.accountNumber = req.session.accountNumber; 
+        obj.accountNumber = req.session.accountNumber;
       // Employee - account number from body is set before switch statment
       case 2:
+      // Admin -
+      case 3:
         step1TransactionHistory(obj, res);
         break;
     }
@@ -83,9 +81,8 @@ function step1TransactionHistory(obj, res) {
   });
 }
 
-
 // Get the account balance from the account number in session
-function step2TransactionHistory(obj, res){
+function step2TransactionHistory(obj, res) {
   let sql = "CALL get_account_balance(?);";
   dbCon.query(sql, [obj.accountNumber], function (err, rows) {
     if (err) {
@@ -104,7 +101,7 @@ function step2TransactionHistory(obj, res){
 }
 
 // Get all the rows of the transacion history and format them
-function step3TransactionHistory(obj, res){
+function step3TransactionHistory(obj, res) {
   const sql = "CALL `get_account_transaction_history`(?);";
   dbCon.query(sql, [obj.accountNumber], function (err, rows) {
     if (err) {
