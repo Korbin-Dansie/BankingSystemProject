@@ -41,6 +41,8 @@
           </tr> -->
           <tr>
             <th scope="col">Amount</th>
+            <th scope="col">To</th>
+            <th scope="col">From</th>
             <th scope="col">Memo</th>
             <th scope="col">Date</th>
           </tr>
@@ -51,6 +53,14 @@
             <%if (entry.account_type_id == 1) { %>
             <tr>
               <td><%= entry.transaction_amount %></td>
+              <!-- Fill in the to / from cell with the account number. Leave the other one empty-->
+                 <% if(entry.isDeposit == 1) {%>
+                <td></td>
+                <td><%= entry.other_account_number %></td>
+              <% } else { %>
+                <td><%= entry.other_account_number %></td>
+                <td></td>
+              <% } %>
               <td><%= entry.memo %></td>
               <td><%= entry.transaction_time %></td>
             </tr>
@@ -68,6 +78,8 @@
           </tr> -->
           <tr>
             <th scope="col">Amount</th>
+            <th scope="col">To</th>
+            <th scope="col">From</th>
             <th scope="col">Memo</th>
             <th scope="col">Date</th>
           </tr>
@@ -78,6 +90,14 @@
               <%if (entry.account_type_id == 2) { %>
               <tr>
                 <td><%= entry.transaction_amount %></td>
+                              <!-- Fill in the to / from cell with the account number. Leave the other one empty-->
+                              <% if(entry.isDeposit == 1) {%>
+                                <td></td>
+                                <td><%= entry.other_account_number %></td>
+                              <% } else { %>
+                                <td><%= entry.other_account_number %></td>
+                                <td></td>
+                              <% } %>
                 <td><%= entry.memo %></td>
                 <td><%= entry.transaction_time %></td>
                 </tr>

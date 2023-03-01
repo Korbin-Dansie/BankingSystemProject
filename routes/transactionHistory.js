@@ -107,6 +107,7 @@ function step3TransactionHistory(obj, res) {
     if (err) {
       throw err;
     }
+    console.log(rows[0]);
     // Alter the transaction into the correct format
     const moneyFormatter = new Intl.NumberFormat("en-US", {
       style: "currency",
