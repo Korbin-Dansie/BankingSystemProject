@@ -44,7 +44,8 @@ router.post("/", function (req, res, next) {
       case 1:
       // Employee - Get their account number from session
       case 2:
-        obj.accountNumber = req.session.accountNumber;
+        res.redirect("/");
+        break;
       // admin
       case 3:
         //Check if they submited the updated password
