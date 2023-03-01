@@ -16,8 +16,7 @@ router.get("/", function (req, res, next) {
       case 1:
       // Employee
       case 2:
-        obj.accountNumber = req.session.accountNumber;
-        step1ChangePassword(obj, res);
+        res.redirect("/");
         break;
       // Admin - Go to select account page
       case 3:
@@ -45,7 +44,8 @@ router.post("/", function (req, res, next) {
       case 1:
       // Employee - Get their account number from session
       case 2:
-        obj.accountNumber = req.session.accountNumber;
+        res.redirect("/");
+        break;
       // admin
       case 3:
         //Check if they submited the updated password
