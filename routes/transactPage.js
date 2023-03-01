@@ -14,12 +14,12 @@ router.get("/", function (req, res, next) {
     switch (Number(req.session.userRole)) {
       // Customer
       case 1:
-      // Admin
-      case 3:
         res.redirect("/");
         break;
       // Employee
       case 2:
+      // Admin
+      case 3:
         res.render("transactPage", {});
         break;
     }
@@ -36,24 +36,24 @@ router.post("/", function (req, res, next) {
 
   if (!req.session.loggedIn || req.session.loggedIn == false) {
     res.redirect("/");
-  }
-  else{
+  } else {
     switch (Number(req.session.userRole)) {
       // Customer
       case 1:
-      // Admin
-      case 3:
         res.redirect("/");
         break;
+
       // Employee
       case 2:
+      // Admin
+      case 3:
         step0Transact(obj, req, res);
         break;
     }
   }
 });
 
-function step0Transact(obj, req, res){
+function step0Transact(obj, req, res) {
   // We know if its a withdraw of deposit so do that action
   if (
     req.body.amount &&

@@ -26,6 +26,16 @@
           event.preventDefault();
         }
       }
+
+      function checkAccountNumberSelf(event){
+        const accountNumberDom = document.getElementById("accountNumber");
+        const sessionAccountNumber = document.getElementById("sessionAccountNumber").value;
+
+        accountNumberDom.value = sessionAccountNumber;
+
+        const form = document.getElementById("transactionSelectForm");
+        form.submit();
+      }
     </script>
   </head>
 
@@ -43,6 +53,7 @@
             <form
               onSubmit="return checkAccountNumber(event);"
               method="post"
+              id="transactionSelectForm"
             >
               <div class="p-4">
                 <!-- Bank Account to -->
@@ -59,11 +70,17 @@
                   />
                 </div>
                 <div class="text-center">
+                  <button id="selfBtn" class="btn btn-secondary text-center mt-2" type="button" onclick="checkAccountNumberSelf()">
+                    Self
+                  </button>
                   <button class="btn btn-primary text-center mt-2" type="submit">
-                    Change Password
+                    Submit
                   </button>
                 </div>
               </div>
+
+              <!-- current session account number -->
+              <input type="hidden" id="sessionAccountNumber" name="sessionAccountNumber" value=<%=locals.accountNumber%>>
             </form>
             <div>
               <p id="message" class="text-danger" style="height: 25px">

@@ -5,54 +5,24 @@ var dbCon = require("../lib/database");
 /* GET home page. */
 router.get("/", function (req, res, next) {
   console.log("register.js GET");
-  res.locals.userRole = req.session.userRole;
-
-  if (!req.session.loggedIn || req.session.loggedIn == false) {
-    res.redirect("/");
-  } else {
-    switch (Number(req.session.userRole)) {
-      // Customer
-      case 1:
-        res.redirect("/");
-        break;
-      // Employee
-      case 2:
-      // Admin
-      case 3:
-        res.render("register", {});
-        break;
-    }
-  }
+  res.render("register", {});
 });
 
 /* POST home page. */
 router.post("/", function (req, res, next) {
   console.log("register.js POST");
-  res.locals.userRole = req.session.userRole;
+  let obj = new Object();
 
-  if (!req.session.loggedIn || req.session.loggedIn == false) {
-    res.redirect("/");
-  } else {
-    switch (Number(req.session.userRole)) {
-      // Customer
-      case 1:
-        res.redirect("/");
-        break;
-      // Employee
-      case 2:
-      // Admin
-      case 3:
-        let obj = new Object();
-        obj.firstName = req.body.firstName;
-        obj.lastName = req.body.lastName;
-        obj.salt = req.body.salt;
-        obj.hash = req.body.hash;
-        obj.email = req.body.email;
-        obj.userRole = 1;
-        // From register.ejs - To registerSuccess.ejs
-        step1Register(obj, res);
-        break;
-    }
+  // Make sure the needed variables are sent
+  if(req.body.firstName && req.body.lastName && req.body.salt && req.body.hash && req.body.email){
+    obj.firstName = req.body.firstName;
+    obj.lastName = req.body.lastName;
+    obj.salt = req.body.salt;
+    obj.hash = req.body.hash;
+    obj.email = req.body.email;
+    obj.userRole = 1;
+    // From register.ejs - To registerSuccess.ejs
+    step1Register(obj, res);
   }
 });
 

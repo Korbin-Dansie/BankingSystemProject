@@ -25,7 +25,7 @@ router.get("/", function (req, res, next) {
       case 2:
       // Admin -
       case 3:
-        res.render("transactionHistorySelect");
+        res.render("transactionHistorySelect", {accountNumber: req.session.accountNumber});
         break;
     }
   }
