@@ -24,17 +24,29 @@
         if (isNaN(accountNumber)) {
           messageElement.innerText = "Account Number is not a number";
           event.preventDefault();
+        }else if(accountNumber == ""){
+          messageElement.innerText = "Please enter a number";
+          event.preventDefault();
         }
       }
 
       function checkAccountNumberSelf(event){
+        const messageElement = document.getElementById("message");
+        messageElement.innerText = "";
+
         const accountNumberDom = document.getElementById("accountNumber");
         const sessionAccountNumber = document.getElementById("sessionAccountNumber").value;
-
         accountNumberDom.value = sessionAccountNumber;
-
-        const form = document.getElementById("transactionSelectForm");
+        const accountNumber = accountNumberDom.value;
+        if (isNaN(accountNumber)) {
+          messageElement.innerText = "Account Number is not a number";
+        }else if(accountNumber == ""){
+          messageElement.innerText = "Please enter a number";
+        }
+        else{
+          const form = document.getElementById("transactionSelectForm");
         form.submit();
+        }
       }
     </script>
   </head>
